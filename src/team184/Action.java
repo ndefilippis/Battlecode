@@ -15,8 +15,8 @@ public class Action implements Comparable{
 		this.goal = goal;
 	}
 	
-	public int mannhattan(){
-		return Math.abs(location.x-goal.x)+Math.abs(location.y+goal.y);
+	public double mannhattan(){
+		return Math.sqrt(location.distanceSquaredTo(goal));
 	}
 
 	@Override
