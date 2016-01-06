@@ -407,7 +407,6 @@ public class RobotPlayer {
 
     }
 
-
     private static void runVIPER(RobotController rc, Stack<Action> moves) {
         try {
             moves = new Stack<Action>();
