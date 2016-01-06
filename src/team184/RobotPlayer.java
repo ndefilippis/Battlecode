@@ -8,6 +8,7 @@ import java.util.Stack;
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
@@ -43,17 +44,22 @@ public class RobotPlayer {
     		double cost = curr.cost;
     		for(Direction d : Direction.values()){
     			Action toAdd;
+    			double mult = 1;
     			if(d == Direction.NONE || d == Direction.OMNI){
     				continue;
     			}
+    			if(d == Direction.NORTH_EAST || d == Direction.NORTH_EAST || d == Direction.NORTH_EAST || d == Direction.NORTH_EAST){
+    				mult = GameConstants.DIAGONAL_DELAY_MULTIPLIER;
+    			}
     			MapLocation test = curr.location.add(d);
     			try {
-					if(test.distanceSquaredTo(rc.getLocation()) <= rc.getType().attackRadiusSquared && rc.onTheMap(test) && !visited.contains(test)){
+					if(test.distanceSquaredTo(rc.getLocation()) <= rc.getType().attackRadiusSquared && rc.onTheMap(test) && !visited.contains(test) && rc.senseRobotAtLocation(test) == null){
 						if(rc.senseRubble(test) >= 100){
 							toAdd = new Action(test, goal, MyActionType.DIG, curr.cost+2);
+							visited.add(test);
 						}
 						else{
-							toAdd = new Action(test, goal, MyActionType.MOVE, curr.cost+1);
+							toAdd = new Action(test, goal, MyActionType.MOVE, curr.cost+1*mult);
 							visited.add(test);
 						}
 						toAdd.cameFrom = curr;
@@ -70,7 +76,6 @@ public class RobotPlayer {
     		}
     	}
     	Stack<Action> moves = new Stack<Action>();
-    	System.out.println(minAction);
     	while(minAction.cameFrom != null){
     		moves.push(minAction);
     		minAction = minAction.cameFrom;
@@ -90,7 +95,8 @@ public class RobotPlayer {
     	}
     	if(action.type == MyActionType.MOVE){
     		try {
-				rc.move(rc.getLocation().directionTo(action.location));
+    			if(rc.canMove(rc.getLocation().directionTo(action.location)))
+					rc.move(rc.getLocation().directionTo(action.location));
 			} catch (GameActionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -99,6 +105,11 @@ public class RobotPlayer {
     }
     
     public static void run(RobotController rc) {
+    	Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
+                Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+    	RobotType[] robotTypes = {RobotType.SCOUT, RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
+                RobotType.GUARD, RobotType.GUARD, RobotType.VIPER};
+                    
     	Stack<Action> moves = null;
         if (rc.getType() == RobotType.ARCHON) {
             try {
@@ -115,7 +126,12 @@ public class RobotPlayer {
                 // This is a loop to prevent the run() method from returning. Because of the Clock.yield()
                 // at the end of it, the loop will iterate once per game round.
                 try {
-                	
+                	int i = (int)(7*Math.random());
+                	if(rc.canBuild(Direction.NORTH, robotTypes[i])){
+                		if(rc.isCoreReady()){
+                			rc.build(Direction.NORTH, robotTypes[i]);
+                		}
+                	}
                     Clock.yield();
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -135,9 +151,16 @@ public class RobotPlayer {
 
             while (true) {
             	RobotInfo[] ri = rc.senseNearbyRobots();
-            	if(ri.length > 0){
-            		MapLocation l = rc.senseNearbyRobots()[0].location;
-            		if(rc.canAttackLocation(l) && rc.getType().canAttack()){
+            	RobotInfo sense = null;
+            	for(RobotInfo  r : ri){
+            		if(r.team != rc.getTeam()){
+            			sense = r;
+            			break;
+            		}
+            	}
+            	if(sense != null){
+            		MapLocation l = sense.location;
+            		if(rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != rc.getTeam()){
             			try {
 							rc.attackLocation(l);
 						} catch (GameActionException e) {
@@ -146,13 +169,24 @@ public class RobotPlayer {
 						}
             		}
             		else{
-            			if(moves.isEmpty()){
+            			if(moves.isEmpty() && rc.getType().canMove()){
             				moves = pathTo(l, rc);
             				
             			}
             			else if(rc.isCoreReady()){
                 			move(moves.pop(), rc);
             			}
+            		}
+            	}
+            	else{
+            		Direction d = directions[(int)(8*Math.random())];
+            		if(rc.canMove(d) && rc.isCoreReady()){
+            			try {
+							rc.move(d);
+						} catch (GameActionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
             		}
             	}
                 try {
