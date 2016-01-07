@@ -9,5 +9,9 @@ public class RobotPlayerTest {
 	public void testSanity() {
 		assertEquals(2, 1+1);
 	}
+	@Test
+	public void testMessageLocation(){
+		
+	}
 
 }
