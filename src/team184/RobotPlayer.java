@@ -25,7 +25,7 @@ public class RobotPlayer {
     private static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
             Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
     private static RobotType[] robotTypes = {RobotType.SCOUT, RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
-            RobotType.GUARD, RobotType.GUARD, RobotType.VIPER};
+            RobotType.GUARD, RobotType.GUARD, RobotType.SOLDIER};
 
     public static Stack<Action> pathTo(MapLocation goal, RobotController rc) {
         PriorityQueue<Action> front = new PriorityQueue<Action>();
@@ -73,7 +73,6 @@ public class RobotPlayer {
                         front.add(toAdd);
                     }
                 } catch (GameActionException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -92,7 +91,6 @@ public class RobotPlayer {
             try {
                 rc.clearRubble(rc.getLocation().directionTo(action.location));
             } catch (GameActionException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -101,7 +99,6 @@ public class RobotPlayer {
                 if (rc.canMove(rc.getLocation().directionTo(action.location)))
                     rc.move(rc.getLocation().directionTo(action.location));
             } catch (GameActionException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -112,8 +109,9 @@ public class RobotPlayer {
         Stack<Action> moves = null;
         if (rc.getType() == RobotType.ARCHON) {
             runARCHON(rc, moves);
-        } else if (rc.getType() != RobotType.ARCHON) {
+        } else if (rc.getType() == RobotType.SCOUT) {
             runSCOUT(rc, moves);
+        } else {
             runSOLDIER(rc, moves);
             runTTM(rc, moves);
             runGUARD(rc, moves);
@@ -124,7 +122,7 @@ public class RobotPlayer {
 
     private static void runARCHON(RobotController rc, Stack<Action> moves) {
         try {
-
+            rc.build(Direction.NORTH, RobotType.SCOUT);
             // Any code here gets executed exactly once at the beginning of the game.
         } catch (Exception e) {
             // Throwing an uncaught exception makes the robot die, so we need to catch exceptions.
@@ -137,10 +135,24 @@ public class RobotPlayer {
             // This is a loop to prevent the run() method from returning. Because of the Clock.yield()
             // at the end of it, the loop will iterate once per game round.
             try {
-                int i = (int) (7 * Math.random());
-                if (rc.canBuild(Direction.NORTH, robotTypes[i])) {
+                if (rc.canBuild(Direction.NORTH, robotTypes[(int) (7 * Math.random())])) {
                     if (rc.isCoreReady()) {
-                        rc.build(Direction.NORTH, robotTypes[i]);
+                        rc.build(Direction.NORTH, robotTypes[(int) (7 * Math.random())]);
+                    }
+                }
+                if (rc.canBuild(Direction.EAST, robotTypes[(int) (7 * Math.random())])) {
+                    if (rc.isCoreReady()) {
+                        rc.build(Direction.EAST, robotTypes[(int) (7 * Math.random())]);
+                    }
+                }
+                if (rc.canBuild(Direction.SOUTH, robotTypes[(int) (7 * Math.random())])) {
+                    if (rc.isCoreReady()) {
+                        rc.build(Direction.SOUTH, robotTypes[(int) (7 * Math.random())]);
+                    }
+                }
+                if (rc.canBuild(Direction.WEST, robotTypes[(int) (7 * Math.random())])) {
+                    if (rc.isCoreReady()) {
+                        rc.build(Direction.WEST, robotTypes[(int) (7 * Math.random())]);
                     }
                 }
                 Clock.yield();
