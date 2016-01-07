@@ -1,10 +1,6 @@
 package scoutsAndSoldiers;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 
 public class TurretRobot  extends BaseRobot {
 

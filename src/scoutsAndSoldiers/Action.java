@@ -1,5 +1,6 @@
 package scoutsAndSoldiers;
-import battlecode.common.*;
+
+import battlecode.common.MapLocation;
 
 public class Action implements Comparable{
 	MapLocation location;
