@@ -2,6 +2,7 @@ package team184;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 
@@ -21,10 +22,12 @@ public abstract class BaseRobot {
     
 	protected Stack<Action> moves = null;
 	protected RobotController rc;
+	Random random;
 	
 	public BaseRobot(RobotController rc){
 		this.rc = rc;
 		moves = new Stack<Action>();
+		random = new Random(rc.getID()*rc.getRoundNum());
 	}
 	
 	public void loop(){
