@@ -6,7 +6,8 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 
 public class ArchonRobot extends BaseRobot{
-	protected static RobotType[] robotTypes = {RobotType.TURRET};
+	private RobotType[] buildRobotTypes = {RobotType.SCOUT, RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
+            RobotType.GUARD, RobotType.GUARD, RobotType.VIPER, RobotType.TURRET};
             
 	public ArchonRobot(RobotController rc){
 		super(rc);
@@ -15,17 +16,18 @@ public class ArchonRobot extends BaseRobot{
 	@Override
 	public void run() {
 		Direction buildDirection = directions[(int) (8 * Math.random())];
-		if (rc.canBuild(buildDirection, robotTypes[0])) {
+		RobotType robot = buildRobotTypes[(int) (8 * Math.random())];
+		if (rc.canBuild(buildDirection, robot)) {
 			if (rc.isCoreReady()) {
 				try {
-					rc.build(buildDirection, robotTypes[0]);
+					rc.build(buildDirection, robot);
 				} catch (GameActionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}
-		else {
+		else if(Math.random() < 0.25){
 			Direction d = directions[(int) (8 * Math.random())];
 			if (rc.canMove(d) && rc.isCoreReady()) {
 				try {
