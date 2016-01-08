@@ -1,4 +1,4 @@
-package team184;
+package kiting;
 
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;

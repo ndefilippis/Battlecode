@@ -1,4 +1,4 @@
-package team184;
+package kiting;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -39,12 +39,7 @@ public abstract class BaseRobot {
 		while(true){
 			prerun();
 			
-			try {
-				run();
-			} catch (GameActionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			run();
 			
 			postrun();
 			
@@ -56,7 +51,7 @@ public abstract class BaseRobot {
 		Clock.yield();
 	}
 
-	public abstract void run() throws GameActionException;
+	public abstract void run();
 
 	private void prerun() {
 		// TODO Auto-generated method stub
@@ -178,5 +173,6 @@ public abstract class BaseRobot {
 	    }
 	    return moves;
 	}
-
+	
+	
 }
