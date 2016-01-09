@@ -1,4 +1,4 @@
-package team184;
+package kiting;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -14,7 +14,6 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
-import battlecode.common.Team;
 /*Base Robot class for implementing
  * 
  * 
@@ -22,17 +21,16 @@ import battlecode.common.Team;
  * 
  */
 public abstract class BaseRobot {
+
 	protected static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
             Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-	static int[] tryDirections = {0,-1,1,-2,2};
+    
 	protected Stack<Action> moves = null;
 	protected RobotController rc;
-	protected Team myTeam;
 	Random random;
 	
 	public BaseRobot(RobotController rc){
 		this.rc = rc;
-		myTeam = rc.getTeam();
 		moves = new Stack<Action>();
 		random = new Random(rc.getID()*rc.getRoundNum());
 	}
@@ -41,12 +39,7 @@ public abstract class BaseRobot {
 		while(true){
 			prerun();
 			
-			try {
-				run();
-			} catch (GameActionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			run();
 			
 			postrun();
 			
@@ -58,7 +51,7 @@ public abstract class BaseRobot {
 		Clock.yield();
 	}
 
-	public abstract void run() throws GameActionException;
+	public abstract void run();
 
 	private void prerun() {
 		// TODO Auto-generated method stub
@@ -181,23 +174,5 @@ public abstract class BaseRobot {
 	    return moves;
 	}
 	
-	public  void tryToMove(Direction forward) throws GameActionException{
-		if(rc.isCoreReady()){
-			for(int deltaD:tryDirections){
-				Direction maybeForward = Direction.values()[(forward.ordinal()+deltaD+8)%8];
-				if(rc.canMove(maybeForward)){
-					rc.move(maybeForward);
-					return;
-				}
-			}
-			if(rc.getType().canClearRubble()){
-				//failed to move, look to clear rubble
-				MapLocation ahead = rc.getLocation().add(forward);
-				if(rc.senseRubble(ahead)>=GameConstants.RUBBLE_OBSTRUCTION_THRESH){
-					rc.clearRubble(forward);
-				}
-			}
-		}
-	}
-
+	
 }
