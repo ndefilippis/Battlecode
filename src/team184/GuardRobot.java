@@ -16,12 +16,7 @@ public class GuardRobot extends BaseRobot {
 
 	@Override
 	public void run() throws GameActionException {
-		RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared);
-		if(enemyInfo.length > 0)
-			forward();
-		else{
 			guardCode();
-		}
 	}
 
 	private void guardCode() throws GameActionException {
