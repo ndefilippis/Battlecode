@@ -12,7 +12,7 @@ import battlecode.common.Team;
 public class SoldierRobot  extends BaseRobot {
 	Direction d = Direction.EAST;
 	MapLocation nearestArchonLocation;
-	
+
 	public void inititalize(){
 		RobotInfo[] nearbyRobots = rc.senseNearbyRobots(2, myTeam);
 		for(RobotInfo ri : nearbyRobots){
@@ -35,28 +35,23 @@ public class SoldierRobot  extends BaseRobot {
 				nearbyArchon = true;
 			}
 		}
-		if(enemyInfo.length > 0 && allies.length < 2 && !nearbyArchon)
+		if(enemyInfo.length > 0 && allies.length < 1 && !nearbyArchon)
 			kite();
 		else{
 			defaultBehavior();
 		}
 	}
-	
+
 	public void kite() throws GameActionException{
 		boolean dig = false;
 		if(rc.isWeaponReady()){
 			RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().attackRadiusSquared);
 			//RobotInfo[] zombieInfo = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, Team.ZOMBIE);
-			
+
 			//RobotInfo[] enemyInfo = Utility.combine(opponentInfo, zombieInfo);
-			try {
-				if(enemyInfo.length > 0){
-					rc.attackLocation(enemyInfo[0].location);
-					d = rc.getLocation().directionTo(enemyInfo[0].location).opposite();
-				}
-			} catch (GameActionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(enemyInfo.length > 0){
+				rc.attackLocation(enemyInfo[0].location);
+				d = rc.getLocation().directionTo(enemyInfo[0].location).opposite();
 			}
 		}
 		boolean toTurn = Utility.isBlocked(rc, rc.getLocation().add(d, 3)) && rc.isCoreReady();
@@ -71,16 +66,11 @@ public class SoldierRobot  extends BaseRobot {
 			}
 		}
 		if(rc.isCoreReady()){
-			try {
-				if(dig){
-					rc.clearRubble(d);
-				}
-				else if(rc.canMove(d)){
-					rc.move(d);
-				}
-			} catch (GameActionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(dig){
+				rc.clearRubble(d);
+			}
+			else if(rc.canMove(d)){
+				rc.move(d);
 			}
 		}
 	}

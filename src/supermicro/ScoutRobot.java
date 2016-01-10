@@ -1,4 +1,4 @@
-package team184;
+package supermicro;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +21,7 @@ public class ScoutRobot extends BaseRobot {
 		RETREAT,
 		FIND_ENEMY
 	}
-
+	
 	public void initialize(){
 		d = randomDirection();
 	}
@@ -30,8 +30,8 @@ public class ScoutRobot extends BaseRobot {
 		sentRobots = new HashSet<RobotInfo>();
 		sentPartsCaches = new HashSet<MapLocation>();
 	}
-
-	private void lookForZombieDens() throws GameActionException{
+	
+	private void lookForZombieDens(){
 		RobotInfo[] zombies = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, Team.ZOMBIE);
 		for(RobotInfo ri : zombies){
 			if(sentRobots.contains(ri) || ri.type != RobotType.ZOMBIEDEN){
@@ -42,13 +42,18 @@ public class ScoutRobot extends BaseRobot {
 			neutralSignal.setPingedLocation(rc.getLocation().x-ri.location.x, rc.getLocation().y-ri.location.y);
 			neutralSignal.setPingedTeam(Team.ZOMBIE);
 			neutralSignal.setPingedType(ri.type);
-			if(neutralSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
-				sentRobots.add(ri);
-			}
+			try {
+				if(neutralSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
+					sentRobots.add(ri);
+				}
+			} catch (GameActionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			};
 		}
 	}
-
-	private void lookForNeutralRobots() throws GameActionException{
+	
+	private void lookForNeutralRobots(){
 		RobotInfo[] neutralRobots = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, Team.NEUTRAL);
 		for(RobotInfo ri : neutralRobots){
 			if(sentRobots.contains(ri)){
@@ -59,13 +64,18 @@ public class ScoutRobot extends BaseRobot {
 			neutralSignal.setPingedLocation(rc.getLocation().x-ri.location.x, rc.getLocation().y-ri.location.y);
 			neutralSignal.setPingedTeam(Team.NEUTRAL);
 			neutralSignal.setPingedType(ri.type);
-			if(neutralSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
-				sentRobots.add(ri);
-			}
+			try {
+				if(neutralSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
+					sentRobots.add(ri);
+				}
+			} catch (GameActionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			};
 		}
 	}
-
-	private void lookForPartsCache() throws GameActionException{
+	
+	private void lookForPartsCache(){
 		int senseRadius = (int) Math.sqrt(rc.getType().sensorRadiusSquared);
 		MapLocation myLocation = rc.getLocation();
 		for(int dx = -senseRadius; dx <= senseRadius; dx++){
@@ -76,24 +86,34 @@ public class ScoutRobot extends BaseRobot {
 						partsSignal.setMessageType(MessageSignal.MessageType.PARTS);
 						partsSignal.setPingedLocation(dx, dy);
 						partsSignal.setPingedParts((int)rc.senseParts(myLocation.add(dx, dy)));
-						if(partsSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
-							sentPartsCaches.add(myLocation.add(dx, dy));
+						try {
+							if(partsSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
+								sentPartsCaches.add(myLocation.add(dx, dy));
+							}
+						} catch (GameActionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
 				}
 			}
 		}
 	}
-
+	
 	@Override
-	public void run() throws GameActionException {
+	public void run() {
 		lookForNeutralRobots();
 		lookForPartsCache();
-
-
+		
+		
 		if(rc.canMove(d)){
 			if(rc.isCoreReady()){
-				rc.move(d);
+				try {
+					rc.move(d);
+				} catch (GameActionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		else{

@@ -1,4 +1,4 @@
-package grouping;
+package supermicro;
 
 import battlecode.common.RobotController;
 

@@ -1,4 +1,4 @@
-package grouping;
+package supermicro;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -44,6 +44,8 @@ public class RobotPlayer {
     			System.out.println("I don't think TTMs get passed here");
     			break;
     	}
+    	br.initialize();
 		br.loop();
+		System.out.println("You've ended early");
     }
 }

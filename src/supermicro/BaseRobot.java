@@ -1,4 +1,4 @@
-package grouping;
+package supermicro;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -34,7 +34,11 @@ public abstract class BaseRobot {
 		this.rc = rc;
 		myTeam = rc.getTeam();
 		moves = new Stack<Action>();
-		random = new Random(rc.getID()*rc.getRoundNum());
+		random = new Random(rc.getID());
+	}
+	
+	public void initialize(){
+		
 	}
 	
 	public void loop(){
@@ -69,14 +73,14 @@ public abstract class BaseRobot {
 	        RobotInfo[] ri = rc.senseNearbyRobots();
 	        RobotInfo sense = null;
 	        for (RobotInfo r : ri) {
-	            if (r.team != rc.getTeam()) {
+	            if (r.team != myTeam) {
 	                sense = r;
 	                break;
 	            }
 	        }
 	        if (sense != null) {
 	            MapLocation l = sense.location;
-	            if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != rc.getTeam()) {
+	            if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != myTeam) {
 	                try {
 	                    rc.attackLocation(l);
 	                } catch (GameActionException e) {
@@ -91,7 +95,7 @@ public abstract class BaseRobot {
 	                }
 	            }
 	        } else {
-	            Direction d = directions[(int) (8 * Math.random())];
+	            Direction d = directions[random.nextInt(8)];
 	            if (rc.canMove(d) && rc.isCoreReady()) {
 	                try {
 	                    rc.move(d);
@@ -102,6 +106,30 @@ public abstract class BaseRobot {
 	        }
 	    }
 	
+	protected boolean tryToRetreat(RobotInfo[] nearbyEnemies) throws GameActionException {
+        Direction bestRetreatDir = null;
+        RobotInfo currentClosestEnemy = Utility.closest(nearbyEnemies, rc.getLocation());
+
+        int bestDistSq = rc.getLocation().distanceSquaredTo(currentClosestEnemy.location);
+        for (Direction dir : Direction.values()) {
+            if (!rc.canMove(dir)) continue;
+
+            MapLocation retreatLoc = rc.getLocation().add(dir);
+
+            RobotInfo closestEnemy = Utility.closest(nearbyEnemies, retreatLoc);
+            int distSq = retreatLoc.distanceSquaredTo(closestEnemy.location);
+            if (distSq > bestDistSq) {
+                bestDistSq = distSq;
+                bestRetreatDir = dir;
+            }
+        }
+
+        if (bestRetreatDir != null && rc.isCoreReady()) {
+            rc.move(bestRetreatDir);
+            return true;
+        }
+        return false;
+    }
 	
 	public static void move(Action action, RobotController rc) {
 	    if (action.type == MyActionType.DIG) {
@@ -147,7 +175,7 @@ public abstract class BaseRobot {
 	            if (d == Direction.NONE || d == Direction.OMNI) {
 	                continue;
 	            }
-	            if (d == Direction.NORTH_EAST || d == Direction.NORTH_EAST || d == Direction.NORTH_EAST || d == Direction.NORTH_EAST) {
+	            if (d.isDiagonal()) {
 	                mult = GameConstants.DIAGONAL_DELAY_MULTIPLIER;
 	            }
 	            MapLocation test = curr.location.add(d);
@@ -198,6 +226,10 @@ public abstract class BaseRobot {
 				}
 			}
 		}
+	}
+	
+	public Direction randomDirection() {
+		return Direction.values()[(int)(random.nextDouble()*8)];
 	}
 
 }

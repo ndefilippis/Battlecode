@@ -15,23 +15,13 @@ public class GuardRobot extends BaseRobot {
 	}
 
 	@Override
-	public void run() {
-		RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared);
-		if(enemyInfo.length > 0)
-			forward();
-		else{
-			try {
-				guardCode();
-			} catch (GameActionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+	public void run() throws GameActionException {
+			guardCode();
 	}
-	
+
 	private void guardCode() throws GameActionException {
 		RobotInfo[] enemyArray = rc.senseHostileRobots(rc.getLocation(), 1000000);
-		
+
 		if(enemyArray.length>0){
 			if(rc.isWeaponReady()){
 				//look for adjacent enemies to attack
@@ -70,30 +60,20 @@ public class GuardRobot extends BaseRobot {
 			}
 		}
 	}
-	
-	public void forward(){
+
+	public void forward() throws GameActionException{
 		RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().attackRadiusSquared);
-			if(rc.isWeaponReady()){
-				try {
-					if(enemyInfo.length > 0 && rc.canAttackLocation(enemyInfo[0].location)){
-						rc.attackLocation(enemyInfo[0].location);
-					}
-				} catch (GameActionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		if(rc.isWeaponReady()){
+			if(enemyInfo.length > 0 && rc.canAttackLocation(enemyInfo[0].location)){
+				rc.attackLocation(enemyInfo[0].location);
 			}
-				if(rc.isCoreReady()){
-					try {
-						if(enemyInfo.length > 0){
-							d = rc.getLocation().directionTo(enemyInfo[0].location);
-						}
-						if(rc.canMove(d))
-							rc.move(d);
-					} catch (GameActionException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+		}
+		if(rc.isCoreReady()){
+			if(enemyInfo.length > 0){
+				d = rc.getLocation().directionTo(enemyInfo[0].location);
 			}
+			if(rc.canMove(d))
+				rc.move(d);
+		}
 	}
+}
