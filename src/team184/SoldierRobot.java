@@ -35,7 +35,7 @@ public class SoldierRobot  extends BaseRobot {
 				nearbyArchon = true;
 			}
 		}
-		if(enemyInfo.length > 0 && allies.length < 2 && !nearbyArchon)
+		if(enemyInfo.length > 0 && allies.length < 1 && !nearbyArchon)
 			kite();
 		else{
 			defaultBehavior();

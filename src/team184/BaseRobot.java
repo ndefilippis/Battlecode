@@ -75,14 +75,8 @@ public abstract class BaseRobot {
 	 * @throws GameActionException
 	 */
 	protected void defaultBehavior() throws GameActionException {
-		RobotInfo[] ri = rc.senseNearbyRobots();
-		RobotInfo sense = null;
-		for (RobotInfo r : ri) {
-			if (r.team != myTeam && r.team != Team.NEUTRAL) {
-				sense = r;
-				break;
-			}
-		}
+		RobotInfo[] ri = rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared);
+		RobotInfo sense = Utility.closest(ri, rc.getLocation());
 		if (sense != null) {
 			MapLocation l = sense.location;
 			if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady()) {
