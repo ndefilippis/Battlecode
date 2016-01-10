@@ -9,6 +9,11 @@ public class ViperRobot  extends BaseRobot {
 	}
 
 	@Override
+	public void initial() {
+
+	}
+
+	@Override
 	public void run() {
 		defaultBehavior();
 	}

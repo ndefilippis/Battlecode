@@ -8,6 +8,11 @@ public class GuardRobot extends BaseRobot {
 	}
 
 	@Override
+	public void initial() {
+
+	}
+
+	@Override
 	public void run() {
 		defaultBehavior();
 	}
