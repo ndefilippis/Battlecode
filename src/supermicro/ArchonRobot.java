@@ -1,13 +1,8 @@
 package supermicro;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Signal;
-import battlecode.common.Team;
+import battlecode.common.*;
+
+import java.util.ArrayList;
 
 public class ArchonRobot extends BaseRobot{
 	private RobotType[] buildRobotTypes = {
@@ -24,6 +19,7 @@ public class ArchonRobot extends BaseRobot{
 	private int leaderId;
 	private MapLocation destination;
 	private MapLocation leaderLocation;
+	private ArrayList<MapLocation> neutralBotLocations = new ArrayList<MapLocation>();
 	private boolean foundSomething;
 
 	public void getSignals(){
@@ -36,6 +32,7 @@ public class ArchonRobot extends BaseRobot{
 						case ROBOT:
 							if(msgSig.getPingedTeam() == Team.NEUTRAL){
 								destination = msgSig.getPingedLocation();
+								neutralBotLocations.add(destination);
 								foundSomething = true;
 							}
 							break;
@@ -94,7 +91,31 @@ public class ArchonRobot extends BaseRobot{
 				}
 			}
 		}
-		
+
+		//try to convert neutral bots
+		MapLocation closestNeutral = findClosestNeutralBot();
+		if (closestNeutral != null) {
+			if (rc.isCoreReady()) {
+				if (rc.canSenseLocation(closestNeutral)) {
+					try {
+						rc.activate(closestNeutral);
+						rc.broadcastSignal(2);
+					} catch (GameActionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else if (rc.canMove(closestNeutral.directionTo(closestNeutral))) {
+					try {
+						rc.move(closestNeutral.directionTo(closestNeutral));
+						rc.broadcastSignal(2);
+					} catch (GameActionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
 		//try to heal nearby robots
 		RobotInfo[] nearbyAllies = rc.senseNearbyRobots(2, myTeam);
 		RobotInfo friendWithLowestHP = Utility.getRobotWithLowestHP(nearbyAllies);
@@ -122,5 +143,19 @@ public class ArchonRobot extends BaseRobot{
 				defaultBehavior();
 			}
 		}
+	}
+
+	private MapLocation findClosestNeutralBot() {
+		MapLocation closest = neutralBotLocations.get(neutralBotLocations.size() - 1);
+		for (int i = neutralBotLocations.size(); i >= 0; i--) {
+			if (distanceToArchon(closest) < distanceToArchon(neutralBotLocations.get(i))) {
+				closest = neutralBotLocations.get(i);
+			}
+		}
+		return closest;
+	}
+
+	private double distanceToArchon(MapLocation loc) {
+		return Math.sqrt(Math.pow(rc.getLocation().x + loc.x, 2) + Math.pow(rc.getLocation().y + loc.y, 2));
 	}
 }

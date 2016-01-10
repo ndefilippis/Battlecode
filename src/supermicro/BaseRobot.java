@@ -1,20 +1,8 @@
 package supermicro;
 
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Random;
-import java.util.Set;
-import java.util.Stack;
+import battlecode.common.*;
 
-import battlecode.common.Clock;
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.GameConstants;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Team;
+import java.util.*;
 /*Base Robot class for implementing
  * 
  * 
@@ -208,8 +196,8 @@ public abstract class BaseRobot {
 	    }
 	    return moves;
 	}
-	
-	public  void tryToMove(Direction forward) throws GameActionException{
+
+	public void tryToMove(Direction forward) throws GameActionException {
 		if(rc.isCoreReady()){
 			for(int deltaD:tryDirections){
 				Direction maybeForward = Direction.values()[(forward.ordinal()+deltaD+8)%8];
