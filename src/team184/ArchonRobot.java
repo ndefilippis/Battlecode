@@ -74,9 +74,7 @@ public class ArchonRobot extends BaseRobot{
 	public void run() {
 		
 		getSignals();
-		if(foundSomething){
-			defaultBehavior();
-		}
+		
 		//try to build a robot
 		RobotType robot = buildRobotTypes[(random.nextInt(6))];
 		for(Direction d : Direction.values()){
@@ -104,6 +102,20 @@ public class ArchonRobot extends BaseRobot{
 			} catch (GameActionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+		}
+		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), RobotType.ARCHON.sensorRadiusSquared);
+		if(enemies.length > 0){
+			try {
+				tryToRetreat(enemies);
+			} catch (GameActionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else{
+			if(foundSomething){
+				defaultBehavior();
 			}
 		}
 	}

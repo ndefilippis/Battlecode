@@ -7,6 +7,7 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
+import battlecode.common.RobotType;
 import battlecode.common.Team;
 
 public class ScoutRobot extends BaseRobot {
@@ -22,6 +23,28 @@ public class ScoutRobot extends BaseRobot {
 		super(rc);
 		sentRobots = new HashSet<RobotInfo>();
 		sentPartsCaches = new HashSet<MapLocation>();
+	}
+	
+	private void lookForZombieDens(){
+		RobotInfo[] zombies = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, Team.ZOMBIE);
+		for(RobotInfo ri : zombies){
+			if(sentRobots.contains(ri) || ri.type != RobotType.ZOMBIEDEN){
+				continue;
+			}
+			MessageSignal neutralSignal = new MessageSignal(rc);
+			neutralSignal.setMessageType(MessageSignal.MessageType.ROBOT);
+			neutralSignal.setPingedLocation(rc.getLocation().x-ri.location.x, rc.getLocation().y-ri.location.y);
+			neutralSignal.setPingedTeam(Team.ZOMBIE);
+			neutralSignal.setPingedType(ri.type);
+			try {
+				if(neutralSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
+					sentRobots.add(ri);
+				}
+			} catch (GameActionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			};
+		}
 	}
 	
 	private void lookForNeutralRobots(){

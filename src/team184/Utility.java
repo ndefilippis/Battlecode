@@ -46,4 +46,17 @@ public class Utility {
 		}
 		return lowestRobot;
 	}
+
+
+	public static RobotInfo closest(RobotInfo[] robots, MapLocation location) {
+		int minDistance = 100000;
+		RobotInfo lowest = null;
+		for(RobotInfo ri : robots){
+			if(ri.location.distanceSquaredTo(location) < minDistance){
+				minDistance = ri.location.distanceSquaredTo(location);
+				lowest = ri;
+			}
+		}
+		return lowest;
+	}
 }

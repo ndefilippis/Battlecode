@@ -106,7 +106,30 @@ public abstract class BaseRobot {
 	        }
 	    }
 	
-	
+	protected boolean tryToRetreat(RobotInfo[] nearbyEnemies) throws GameActionException {
+        Direction bestRetreatDir = null;
+        RobotInfo currentClosestEnemy = Utility.closest(nearbyEnemies, rc.getLocation());
+
+        int bestDistSq = rc.getLocation().distanceSquaredTo(currentClosestEnemy.location);
+        for (Direction dir : Direction.values()) {
+            if (!rc.canMove(dir)) continue;
+
+            MapLocation retreatLoc = rc.getLocation().add(dir);
+
+            RobotInfo closestEnemy = Utility.closest(nearbyEnemies, retreatLoc);
+            int distSq = retreatLoc.distanceSquaredTo(closestEnemy.location);
+            if (distSq > bestDistSq) {
+                bestDistSq = distSq;
+                bestRetreatDir = dir;
+            }
+        }
+
+        if (bestRetreatDir != null && rc.isCoreReady()) {
+            rc.move(bestRetreatDir);
+            return true;
+        }
+        return false;
+    }
 	
 	public static void move(Action action, RobotController rc) {
 	    if (action.type == MyActionType.DIG) {
@@ -152,7 +175,7 @@ public abstract class BaseRobot {
 	            if (d == Direction.NONE || d == Direction.OMNI) {
 	                continue;
 	            }
-	            if (d == Direction.NORTH_EAST || d == Direction.NORTH_EAST || d == Direction.NORTH_EAST || d == Direction.NORTH_EAST) {
+	            if (d.isDiagonal()) {
 	                mult = GameConstants.DIAGONAL_DELAY_MULTIPLIER;
 	            }
 	            MapLocation test = curr.location.add(d);
