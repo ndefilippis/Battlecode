@@ -1,7 +1,7 @@
-package turrets;
+package grouping;
 import battlecode.common.*;
 
-public class Action implements Comparable<Action>{
+public class Action implements Comparable{
 	MapLocation location;
 	MapLocation goal;
 	MyActionType type;
@@ -20,11 +20,13 @@ public class Action implements Comparable<Action>{
 	}
 
 	@Override
-	public int compareTo(Action a) {
+	public int compareTo(Object o) {
+		Action a = (Action)o;
 		return (int)((this.cost+this.mannhattan()) - (a.cost+a.mannhattan()));
 	}
 	
 	public String toString(){
 		return location + " " + type + " " + (cost+this.mannhattan());
-	}	
+	}
+	
 }

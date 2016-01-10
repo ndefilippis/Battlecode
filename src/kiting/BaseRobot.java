@@ -1,4 +1,4 @@
-package team184;
+package kiting;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -14,7 +14,6 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
-import battlecode.common.Team;
 /*Base Robot class for implementing
  * 
  * 
@@ -22,35 +21,25 @@ import battlecode.common.Team;
  * 
  */
 public abstract class BaseRobot {
+
 	protected static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
             Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-	static int[] tryDirections = {0,-1,1,-2,2};
+    
 	protected Stack<Action> moves = null;
 	protected RobotController rc;
-	protected Team myTeam;
 	Random random;
 	
 	public BaseRobot(RobotController rc){
 		this.rc = rc;
-		myTeam = rc.getTeam();
 		moves = new Stack<Action>();
-		random = new Random(rc.getID());
-	}
-	
-	public void initialize(){
-		
+		random = new Random(rc.getID()*rc.getRoundNum());
 	}
 	
 	public void loop(){
 		while(true){
 			prerun();
 			
-			try {
-				run();
-			} catch (GameActionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			run();
 			
 			postrun();
 			
@@ -62,7 +51,7 @@ public abstract class BaseRobot {
 		Clock.yield();
 	}
 
-	public abstract void run() throws GameActionException;
+	public abstract void run();
 
 	private void prerun() {
 		// TODO Auto-generated method stub
@@ -73,14 +62,14 @@ public abstract class BaseRobot {
 	        RobotInfo[] ri = rc.senseNearbyRobots();
 	        RobotInfo sense = null;
 	        for (RobotInfo r : ri) {
-	            if (r.team != myTeam) {
+	            if (r.team != rc.getTeam()) {
 	                sense = r;
 	                break;
 	            }
 	        }
 	        if (sense != null) {
 	            MapLocation l = sense.location;
-	            if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != myTeam) {
+	            if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != rc.getTeam()) {
 	                try {
 	                    rc.attackLocation(l);
 	                } catch (GameActionException e) {
@@ -95,7 +84,7 @@ public abstract class BaseRobot {
 	                }
 	            }
 	        } else {
-	            Direction d = directions[random.nextInt(8)];
+	            Direction d = directions[(int) (8 * Math.random())];
 	            if (rc.canMove(d) && rc.isCoreReady()) {
 	                try {
 	                    rc.move(d);
@@ -106,30 +95,6 @@ public abstract class BaseRobot {
 	        }
 	    }
 	
-	protected boolean tryToRetreat(RobotInfo[] nearbyEnemies) throws GameActionException {
-        Direction bestRetreatDir = null;
-        RobotInfo currentClosestEnemy = Utility.closest(nearbyEnemies, rc.getLocation());
-
-        int bestDistSq = rc.getLocation().distanceSquaredTo(currentClosestEnemy.location);
-        for (Direction dir : Direction.values()) {
-            if (!rc.canMove(dir)) continue;
-
-            MapLocation retreatLoc = rc.getLocation().add(dir);
-
-            RobotInfo closestEnemy = Utility.closest(nearbyEnemies, retreatLoc);
-            int distSq = retreatLoc.distanceSquaredTo(closestEnemy.location);
-            if (distSq > bestDistSq) {
-                bestDistSq = distSq;
-                bestRetreatDir = dir;
-            }
-        }
-
-        if (bestRetreatDir != null && rc.isCoreReady()) {
-            rc.move(bestRetreatDir);
-            return true;
-        }
-        return false;
-    }
 	
 	public static void move(Action action, RobotController rc) {
 	    if (action.type == MyActionType.DIG) {
@@ -175,7 +140,7 @@ public abstract class BaseRobot {
 	            if (d == Direction.NONE || d == Direction.OMNI) {
 	                continue;
 	            }
-	            if (d.isDiagonal()) {
+	            if (d == Direction.NORTH_EAST || d == Direction.NORTH_EAST || d == Direction.NORTH_EAST || d == Direction.NORTH_EAST) {
 	                mult = GameConstants.DIAGONAL_DELAY_MULTIPLIER;
 	            }
 	            MapLocation test = curr.location.add(d);
@@ -209,27 +174,5 @@ public abstract class BaseRobot {
 	    return moves;
 	}
 	
-	public  void tryToMove(Direction forward) throws GameActionException{
-		if(rc.isCoreReady()){
-			for(int deltaD:tryDirections){
-				Direction maybeForward = Direction.values()[(forward.ordinal()+deltaD+8)%8];
-				if(rc.canMove(maybeForward)){
-					rc.move(maybeForward);
-					return;
-				}
-			}
-			if(rc.getType().canClearRubble()){
-				//failed to move, look to clear rubble
-				MapLocation ahead = rc.getLocation().add(forward);
-				if(rc.senseRubble(ahead)>=GameConstants.RUBBLE_OBSTRUCTION_THRESH){
-					rc.clearRubble(forward);
-				}
-			}
-		}
-	}
 	
-	public Direction randomDirection() {
-		return Direction.values()[(int)(random.nextDouble()*8)];
-	}
-
 }

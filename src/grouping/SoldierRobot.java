@@ -1,26 +1,14 @@
-package team184;
+package grouping;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Signal;
 import battlecode.common.Team;
 
 public class SoldierRobot  extends BaseRobot {
 	Direction d = Direction.EAST;
-	MapLocation nearestArchonLocation;
-	
-	public void inititalize(){
-		RobotInfo[] nearbyRobots = rc.senseNearbyRobots(2, myTeam);
-		for(RobotInfo ri : nearbyRobots){
-			if(ri.type == RobotType.ARCHON){
-				nearestArchonLocation = ri.location;
-			}
-		}
-	}
 	public SoldierRobot(RobotController rc){
 		super(rc);
 	}
@@ -28,14 +16,8 @@ public class SoldierRobot  extends BaseRobot {
 	@Override
 	public void run() throws GameActionException {
 		RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared);
-		RobotInfo[] allies = rc.senseNearbyRobots(9, myTeam);
-		boolean nearbyArchon = false;
-		for(RobotInfo ri : allies){
-			if(ri.type == RobotType.ARCHON){
-				nearbyArchon = true;
-			}
-		}
-		if(enemyInfo.length > 0 && allies.length < 2 && !nearbyArchon)
+		RobotInfo[] allies = rc.senseNearbyRobots(9, rc.getTeam());
+		if(enemyInfo.length > 0 && allies.length < 2)
 			kite();
 		else{
 			defaultBehavior();
@@ -61,7 +43,7 @@ public class SoldierRobot  extends BaseRobot {
 		}
 		boolean toTurn = Utility.isBlocked(rc, rc.getLocation().add(d, 3)) && rc.isCoreReady();
 		if(toTurn){
-			if(rc.senseRubble((rc.getLocation().add(d, 1))) > 100.0){
+			if(rc.senseRubble((rc.getLocation().add(d, 3))) > 100.0){
 				dig = true;
 			}
 			if(Utility.isBlocked(rc, rc.getLocation().add(d.rotateRight().rotateRight(), 3)))
