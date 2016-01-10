@@ -45,7 +45,7 @@ public abstract class BaseRobot {
 
 	public abstract void run();
 
-	private void prerun() {
+	protected void prerun() {
 		// TODO Auto-generated method stub
 		
 	}

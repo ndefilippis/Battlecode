@@ -1,15 +1,9 @@
 package supermicro;
 
+import battlecode.common.*;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Team;
 
 public class ScoutRobot extends BaseRobot {
 	private Set<RobotInfo> sentRobots;
@@ -37,19 +31,19 @@ public class ScoutRobot extends BaseRobot {
 			if(sentRobots.contains(ri) || ri.type != RobotType.ZOMBIEDEN){
 				continue;
 			}
-			MessageSignal neutralSignal = new MessageSignal(rc);
-			neutralSignal.setMessageType(MessageSignal.MessageType.ROBOT);
-			neutralSignal.setPingedLocation(rc.getLocation().x-ri.location.x, rc.getLocation().y-ri.location.y);
-			neutralSignal.setPingedTeam(Team.ZOMBIE);
-			neutralSignal.setPingedType(ri.type);
+			MessageSignal zombieDenSignal = new MessageSignal(rc);
+			zombieDenSignal.setMessageType(MessageSignal.MessageType.ROBOT);
+			zombieDenSignal.setPingedLocation(rc.getLocation().x-ri.location.x, rc.getLocation().y-ri.location.y);
+			zombieDenSignal.setPingedTeam(Team.ZOMBIE);
+			zombieDenSignal.setPingedType(ri.type);
 			try {
-				if(neutralSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
+				if(zombieDenSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
 					sentRobots.add(ri);
 				}
 			} catch (GameActionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			};
+			}
 		}
 	}
 	
@@ -74,6 +68,8 @@ public class ScoutRobot extends BaseRobot {
 			};
 		}
 	}
+
+
 	
 	private void lookForPartsCache(){
 		int senseRadius = (int) Math.sqrt(rc.getType().sensorRadiusSquared);
@@ -102,9 +98,9 @@ public class ScoutRobot extends BaseRobot {
 	
 	@Override
 	public void run() {
+		lookForZombieDens();
 		lookForNeutralRobots();
 		lookForPartsCache();
-		
 		
 		if(rc.canMove(d)){
 			if(rc.isCoreReady()){
