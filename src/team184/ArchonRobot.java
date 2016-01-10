@@ -10,8 +10,12 @@ import battlecode.common.Signal;
 import battlecode.common.Team;
 
 public class ArchonRobot extends BaseRobot{
-	private RobotType[] buildRobotTypes = {RobotType.SCOUT, RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
-            RobotType.GUARD, RobotType.GUARD};
+	private RobotType[] buildRobotTypes = {
+			RobotType.SCOUT, 
+			RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
+            RobotType.GUARD, RobotType.GUARD,
+            RobotType.TURRET, RobotType.TURRET
+            };
             
     int heiarchy = -1;
 	public ArchonRobot(RobotController rc){
@@ -76,7 +80,7 @@ public class ArchonRobot extends BaseRobot{
 		getSignals();
 		
 		//try to build a robot
-		RobotType robot = buildRobotTypes[(random.nextInt(6))];
+		RobotType robot = buildRobotTypes[(random.nextInt(buildRobotTypes.length))];
 		for(Direction d : Direction.values()){
 			if (rc.canBuild(d, robot)) {
 				if (rc.isCoreReady()) {

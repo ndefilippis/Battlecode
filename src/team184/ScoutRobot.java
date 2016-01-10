@@ -3,6 +3,7 @@ package team184;
 import java.util.HashSet;
 import java.util.Set;
 
+import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
@@ -14,10 +15,15 @@ public class ScoutRobot extends BaseRobot {
 	private Set<RobotInfo> sentRobots;
 	private int distanceToNearestArchon = 100;
 	private Set<MapLocation> sentPartsCaches;
+	private Direction d;
 	private enum BehaviorState{
 		LOOK_FOR_CORNERS,
 		RETREAT,
 		FIND_ENEMY
+	}
+	
+	public void initialize(){
+		d = randomDirection();
 	}
 	public ScoutRobot(RobotController rc){
 		super(rc);
@@ -100,6 +106,18 @@ public class ScoutRobot extends BaseRobot {
 		lookForPartsCache();
 		
 		
-		defaultBehavior();
+		if(rc.canMove(d)){
+			if(rc.isCoreReady()){
+				try {
+					rc.move(d);
+				} catch (GameActionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		else{
+			d.rotateLeft();
+		}
 	}
 }

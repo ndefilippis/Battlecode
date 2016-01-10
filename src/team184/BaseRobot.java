@@ -227,5 +227,9 @@ public abstract class BaseRobot {
 			}
 		}
 	}
+	
+	public Direction randomDirection() {
+		return Direction.values()[(int)(random.nextDouble()*8)];
+	}
 
 }

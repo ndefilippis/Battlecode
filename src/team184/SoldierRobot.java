@@ -61,7 +61,7 @@ public class SoldierRobot  extends BaseRobot {
 		}
 		boolean toTurn = Utility.isBlocked(rc, rc.getLocation().add(d, 3)) && rc.isCoreReady();
 		if(toTurn){
-			if(rc.senseRubble((rc.getLocation().add(d, 3))) > 100.0){
+			if(rc.senseRubble((rc.getLocation().add(d, 1))) > 100.0){
 				dig = true;
 			}
 			if(Utility.isBlocked(rc, rc.getLocation().add(d.rotateRight().rotateRight(), 3)))
