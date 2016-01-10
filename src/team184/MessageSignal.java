@@ -18,14 +18,14 @@ public class MessageSignal {
 		COMMAND (2),
 		RUBBLE (3),
 		MAP_EDGE (4);
-		
+
 		int n;
 		MessageType(int n){
 			this.n = n;
 		}
 	}
 	Signal signal;
-	
+
 	/*	int1: 
 	 * 		pos 32: 0 if archon, 1 if scout;
 	 * 		pos 29-31: message type
@@ -42,7 +42,7 @@ public class MessageSignal {
 	 *   parts:
 	 *   	number of parts:
 	 */
-	 
+
 	public MessageSignal(RobotController rc){
 		message = new int[2];
 		if(rc.getType() == RobotType.SCOUT){
@@ -54,18 +54,18 @@ public class MessageSignal {
 		this.signal = signal;
 		message = signal.getMessage();
 	}
-	
+
 	public int[] getMessage(){
 		return message;
 	}
-	
+
 	public void setMessageType(MessageType type){
 		message[0] ^= type.n << 28;
 	}
 	public MessageType getMessageType(){
 		return MessageType.values()[message[0] >> 28 & 0x7];
 	}
-	
+
 	public void setPingedLocation(int dx, int dy){
 		if(dx > 8 || dy > 8 || dx < -8 || dy < -8){
 			System.out.println("offset too big");
@@ -79,7 +79,7 @@ public class MessageSignal {
 		int dy = (message[1] >> 4 & 0xf) - 8;
 		return signal.getLocation().add(dx, dy);
 	}
-	
+
 	public void setPingedTeam(Team t){
 		message[1] ^= t.ordinal() << 8;
 	}

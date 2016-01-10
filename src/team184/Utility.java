@@ -22,14 +22,14 @@ public class Utility {
 		}
 		return ret;
 	}
-	
-	
+
+
 	//Returns whether the Direction is one of the three Directions in the relatively opposite Direction
 	public static boolean oppositeish(Direction d1, Direction d2){
 		Direction dTest = d1.opposite();
 		return d2 == dTest || d2 == dTest.rotateRight() || d2 == dTest.rotateLeft();
 	}
-	
+
 	public static boolean isBlocked(RobotController rc, MapLocation loc) throws GameActionException{
 		return !rc.onTheMap(loc) || rc.senseRubble(loc) >= 100 || rc.senseRobotAtLocation(loc) != null;
 	}
