@@ -99,7 +99,8 @@ public class ArchonRobot extends BaseRobot{
 				if (rc.canSenseLocation(closestNeutral)) {
 					try {
 						rc.activate(closestNeutral);
-						rc.broadcastSignal(2);
+						neutralBotLocations.remove(closestNeutral);
+						rc.broadcastSignal(0);
 					} catch (GameActionException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
