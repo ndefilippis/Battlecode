@@ -1,4 +1,4 @@
-package team184;
+package grouping;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -20,12 +20,7 @@ public class GuardRobot extends BaseRobot {
 		if(enemyInfo.length > 0)
 			forward();
 		else{
-			try {
-				guardCode();
-			} catch (GameActionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			defaultBehavior();
 		}
 	}
 	
@@ -54,15 +49,14 @@ public class GuardRobot extends BaseRobot {
 			//check to see if we are in the way of friends
 			//we are obstructing them
 			if(rc.isCoreReady()){
-				RobotInfo[] nearbyFriends = rc.senseNearbyRobots(2, myTeam);
+				RobotInfo[] nearbyFriends = rc.senseNearbyRobots(2, rc.getTeam());
 				if(nearbyFriends.length>3){
 					Direction away = Direction.values()[random.nextInt(8)];
 					tryToMove(away);
 				}else{//maybe a friend is in need!
-					RobotInfo[] alliesToHelp = rc.senseNearbyRobots(1000000,myTeam);
-					RobotInfo weakestOneRob = Utility.getRobotWithLowestHP(alliesToHelp);
-					if(weakestOneRob!=null){//found a friend most in need
-						MapLocation weakestOne = weakestOneRob.location;
+					RobotInfo[] alliesToHelp = rc.senseNearbyRobots(1000000,rc.getTeam());
+					MapLocation weakestOne = Utility.getRobotWithLowestHP(alliesToHelp).location;
+					if(weakestOne!=null){//found a friend most in need
 						Direction towardFriend = rc.getLocation().directionTo(weakestOne);
 						tryToMove(towardFriend);
 					}

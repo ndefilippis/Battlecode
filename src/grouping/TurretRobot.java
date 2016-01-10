@@ -1,4 +1,4 @@
-package team184;
+package grouping;
 
 import battlecode.common.Clock;
 import battlecode.common.GameActionException;
@@ -22,14 +22,14 @@ public class TurretRobot  extends BaseRobot {
 		RobotInfo[] ri = rc.senseNearbyRobots();
 		RobotInfo sense = null;
 		for (RobotInfo r : ri) {
-			if (r.team != myTeam) {
+			if (r.team != rc.getTeam()) {
 				sense = r;
 				break;
 			}
 		}
 		if (sense != null) {
 			MapLocation l = sense.location;
-			if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != myTeam) {
+			if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != rc.getTeam()) {
 				try {
 					rc.attackLocation(l);
 				} catch (GameActionException e) {

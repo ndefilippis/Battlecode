@@ -1,4 +1,4 @@
-package team184;
+package grouping;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -34,11 +34,7 @@ public abstract class BaseRobot {
 		this.rc = rc;
 		myTeam = rc.getTeam();
 		moves = new Stack<Action>();
-		random = new Random(rc.getID());
-	}
-	
-	public void initialize(){
-		
+		random = new Random(rc.getID()*rc.getRoundNum());
 	}
 	
 	public void loop(){
@@ -73,14 +69,14 @@ public abstract class BaseRobot {
 	        RobotInfo[] ri = rc.senseNearbyRobots();
 	        RobotInfo sense = null;
 	        for (RobotInfo r : ri) {
-	            if (r.team != myTeam) {
+	            if (r.team != rc.getTeam()) {
 	                sense = r;
 	                break;
 	            }
 	        }
 	        if (sense != null) {
 	            MapLocation l = sense.location;
-	            if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != myTeam) {
+	            if (rc.canAttackLocation(l) && rc.getType().canAttack() && rc.isWeaponReady() && sense.team != rc.getTeam()) {
 	                try {
 	                    rc.attackLocation(l);
 	                } catch (GameActionException e) {
@@ -95,7 +91,7 @@ public abstract class BaseRobot {
 	                }
 	            }
 	        } else {
-	            Direction d = directions[random.nextInt(8)];
+	            Direction d = directions[(int) (8 * Math.random())];
 	            if (rc.canMove(d) && rc.isCoreReady()) {
 	                try {
 	                    rc.move(d);
@@ -105,7 +101,6 @@ public abstract class BaseRobot {
 	            }
 	        }
 	    }
-	
 	
 	
 	public static void move(Action action, RobotController rc) {

@@ -1,4 +1,4 @@
-package team184;
+package grouping;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -13,13 +13,10 @@ public class ArchonRobot extends BaseRobot{
 	private RobotType[] buildRobotTypes = {RobotType.SCOUT, RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
             RobotType.GUARD, RobotType.GUARD};
             
-    int heiarchy = -1;
 	public ArchonRobot(RobotController rc){
 		super(rc);
 	}
-	private int leaderId;
 	private MapLocation destination;
-	private MapLocation leaderLocation;
 	private boolean foundSomething;
 
 	public void getSignals(){
@@ -44,35 +41,8 @@ public class ArchonRobot extends BaseRobot{
 		}
 	}
 
-	public void initialize(){
-		try {
-			Signal[] signals = rc.emptySignalQueue();
-			rc.broadcastSignal(30*30);
-			heiarchy = signals.length;
-			rc.setIndicatorString(1, "I am the " + heiarchy + ": " + rc.getRoundNum());
-			if(heiarchy == 0){
-				rc.broadcastMessageSignal(1337, 1337, 30*30);
-			}
-			else{
-				heiarchy-=1;
-				for(Signal s : signals){
-					if(s.getMessage() != null){
-						if(s.getMessage()[0] == 1337){
-							leaderId = s.getID();
-							leaderLocation = s.getLocation();
-						}
-					}
-				}
-			}
-		} catch (GameActionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public void run() {
-		
 		getSignals();
 		if(foundSomething){
 			defaultBehavior();
@@ -84,7 +54,6 @@ public class ArchonRobot extends BaseRobot{
 				if (rc.isCoreReady()) {
 					try {
 						rc.build(d, robot);
-						rc.broadcastSignal(2);
 					} catch (GameActionException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
