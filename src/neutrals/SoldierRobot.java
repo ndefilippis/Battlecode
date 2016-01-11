@@ -1,4 +1,4 @@
-package team184;
+package neutrals;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -13,8 +13,7 @@ public class SoldierRobot  extends BaseRobot {
 	Direction d = Direction.EAST;
 	MapLocation nearestArchonLocation;
 
-	@Override
-	public void initialize(){
+	public void inititalize(){
 		RobotInfo[] nearbyRobots = rc.senseNearbyRobots(2, myTeam);
 		for(RobotInfo ri : nearbyRobots){
 			if(ri.type == RobotType.ARCHON){

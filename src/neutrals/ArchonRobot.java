@@ -1,4 +1,4 @@
-package team184;
+package neutrals;
 
 import java.util.ArrayList;
 
@@ -26,10 +26,8 @@ public class ArchonRobot extends BaseRobot{
 	private int leaderId;
 	private MapLocation destination;
 	private MapLocation leaderLocation;
-	private boolean sentGoal;
-	private Direction teamDirection;
 	private ArrayList<MapLocation> neutralBotLocations = new ArrayList<MapLocation>();
-	private int lastSentGoal;
+	private boolean foundSomething;
 
 	public void getSignals(){
 		Signal[] queue = rc.emptySignalQueue();
@@ -42,10 +40,12 @@ public class ArchonRobot extends BaseRobot{
 						if(msgSig.getPingedTeam() == Team.NEUTRAL){
 							rc.setIndicatorString(0,  "Found neutral");
 							destination = msgSig.getPingedLocation();
+							foundSomething = true;
 						}
 						break;
 					case PARTS:
 						destination = msgSig.getPingedLocation();
+						foundSomething = true;
 					default:
 						break;
 					}
@@ -61,10 +61,7 @@ public class ArchonRobot extends BaseRobot{
 		heiarchy = signals.length;
 		rc.setIndicatorString(1, "I am the " + heiarchy + ": " + rc.getRoundNum());
 		if(heiarchy == 0){
-			teamDirection = Direction.EAST;
-			rc.broadcastMessageSignal(1337, teamDirection.ordinal(), 30*30);
-			leaderId = rc.getID();
-			
+			rc.broadcastMessageSignal(1337, 1337, 30*30);
 		}
 		else{
 			heiarchy-=1;
@@ -73,7 +70,6 @@ public class ArchonRobot extends BaseRobot{
 					if(s.getMessage()[0] == 1337){
 						leaderId = s.getID();
 						leaderLocation = s.getLocation();
-						teamDirection = Direction.values()[s.getMessage()[1]];
 					}
 				}
 			}
@@ -81,7 +77,7 @@ public class ArchonRobot extends BaseRobot{
 	}
 
 	@Override
-	public void prerun() throws GameActionException{
+	public void run() throws GameActionException {
 		if(rc.getRoundNum() % 5 == 0){
 			RobotInfo[] robotsNearMe = rc.senseNearbyRobots();
 			for(RobotInfo ri : robotsNearMe){
@@ -91,29 +87,6 @@ public class ArchonRobot extends BaseRobot{
 			}
 		}
 		getSignals();
-		
-		
-		if(heiarchy == 0 && (!sentGoal || rc.getRoundNum() - lastSentGoal > 10)){
-			MessageSignal goalDirection = new MessageSignal(rc);
-			goalDirection.setMessageType(MessageSignal.MessageType.COMMAND);
-			MapLocation goal = rc.getLocation().add(teamDirection, 4);
-			goalDirection.setPingedLocation(goal);
-			goalDirection.send(30*30);
-			sentGoal = true;
-			while(!rc.onTheMap(rc.getLocation().add(teamDirection, 4))){
-				teamDirection = teamDirection.rotateRight();
-				sentGoal = false;
-			}
-			
-			lastSentGoal = rc.getRoundNum();
-		}
-		else{
-			super.prerun();
-		}
-	}
-	
-	@Override
-	public void run() throws GameActionException {
 
 		//try to heal nearby robots
 		RobotInfo[] nearbyAllies = rc.senseNearbyRobots(2, myTeam);

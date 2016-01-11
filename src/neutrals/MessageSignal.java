@@ -1,4 +1,4 @@
-package team184;
+package neutrals;
 
 import battlecode.common.GameActionException;
 import battlecode.common.GameConstants;
@@ -109,10 +109,5 @@ public class MessageSignal {
 			return true;
 		}
 		return false;
-	}
-	public void setPingedLocation(MapLocation goal) {
-		int dx = rc.getLocation().x-goal.x;
-		int dy = rc.getLocation().y-goal.y;
-		setPingedLocation(dx, dy);
 	}
 }

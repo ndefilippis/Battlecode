@@ -1,4 +1,4 @@
-package team184;
+package neutrals;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -13,7 +13,7 @@ import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
-import battlecode.common.Signal;
+import battlecode.common.RobotType;
 import battlecode.common.Team;
 /*Base Robot class for implementing the types of robots
  * Begins with the startLoop method, which should not exit 
@@ -28,8 +28,6 @@ public abstract class BaseRobot {
 	protected Stack<Action> moves = null;
 	protected RobotController rc;
 	protected Team myTeam;
-	protected MapLocation teamLocation;
-	protected
 	Random random;
 
 	public BaseRobot(RobotController rc){
@@ -47,34 +45,24 @@ public abstract class BaseRobot {
 		initialize();
 
 		while(true){
-			
+			prerun();
 			try {
-				prerun();
 				run();
-				postrun();
 			} catch (GameActionException e) {
 				e.printStackTrace();
 			}
-			
+			postrun();
 		}
 	}
 
-	protected void postrun() throws GameActionException{
+	private void postrun() {
 		Clock.yield();
 	}
 
 	public abstract void run() throws GameActionException;
 
-	protected void prerun() throws GameActionException{
-		Signal[] signals = rc.emptySignalQueue();
-		for(Signal s : signals){
-			if(s.getTeam() == myTeam && s.getMessage() != null){
-				MessageSignal ms = new MessageSignal(s);
-				if(ms.getMessageType() == MessageSignal.MessageType.COMMAND){
-					teamLocation = ms.getPingedLocation();
-				}
-			}
-		}
+	private void prerun() {
+
 	}
 
 
@@ -103,12 +91,7 @@ public abstract class BaseRobot {
 		} else {
 			Direction d = directions[random.nextInt(8)];
 			if (rc.canMove(d) && rc.isCoreReady()) {
-				if(teamLocation != null){
-					tryToMove(rc.getLocation().directionTo(teamLocation));
-				}
-				else{
-					tryToMove(randomDirection());
-				}
+				rc.move(d);
 			}
 		}
 	}
@@ -237,4 +220,5 @@ public abstract class BaseRobot {
 	public Direction randomDirection() {
 		return Direction.values()[(int)(random.nextDouble()*8)];
 	}
+
 }
