@@ -39,6 +39,8 @@ public class ArchonRobot extends BaseRobot{
 					case PARTS:
 						destination = msgSig.getPingedLocation();
 						foundSomething = true;
+					default:
+						break;
 					}
 				}
 			}
@@ -90,6 +92,27 @@ public class ArchonRobot extends BaseRobot{
 			}
 		}
 
+		//try to convert neutral bots
+		MapLocation closestNeutral = findClosestNeutralBot();
+		if (closestNeutral != null) {
+		rc.setIndicatorString(2, "Finding Neutal");
+			if (rc.isCoreReady()) {
+				if (rc.getLocation().distanceSquaredTo(closestNeutral) < 2) {
+					rc.activate(closestNeutral);
+					neutralBotLocations.remove(closestNeutral);
+					rc.broadcastSignal(0);
+				} else if (rc.canMove(rc.getLocation().directionTo(closestNeutral))) {
+					try {
+						rc.move(rc.getLocation().directionTo(closestNeutral));
+						rc.broadcastSignal(2);
+					} catch (GameActionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
 		//try to build a robot
 		RobotType robot = buildRobotTypes[(random.nextInt(buildRobotTypes.length))];
 		for(Direction d : Direction.values()){
@@ -106,25 +129,7 @@ public class ArchonRobot extends BaseRobot{
 			}
 		}
 
-		//try to convert neutral bots
-		MapLocation closestNeutral = findClosestNeutralBot();
-		if (closestNeutral != null) {
-			if (rc.isCoreReady()) {
-				if (rc.canSenseLocation(closestNeutral)) {
-						rc.activate(closestNeutral);
-						neutralBotLocations.remove(closestNeutral);
-						rc.broadcastSignal(0);
-				} else if (rc.canMove(closestNeutral.directionTo(closestNeutral))) {
-					try {
-						rc.move(closestNeutral.directionTo(closestNeutral));
-						rc.broadcastSignal(2);
-					} catch (GameActionException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
+
 
 
 		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), RobotType.ARCHON.sensorRadiusSquared);
@@ -147,7 +152,7 @@ public class ArchonRobot extends BaseRobot{
 		int minDistance = 100000;
 		MapLocation closest = null;
 		for (int i = neutralBotLocations.size()-1; i >= 0; i--) {
-			if (minDistance < rc.getLocation().distanceSquaredTo(neutralBotLocations.get(i))) {
+			if (minDistance > rc.getLocation().distanceSquaredTo(neutralBotLocations.get(i))) {
 				closest = neutralBotLocations.get(i);
 				minDistance = rc.getLocation().distanceSquaredTo(neutralBotLocations.get(i));
 			}

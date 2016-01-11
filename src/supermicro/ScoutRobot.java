@@ -33,7 +33,7 @@ public class ScoutRobot extends BaseRobot {
 			}
 			MessageSignal zombieDenSignal = new MessageSignal(rc);
 			zombieDenSignal.setMessageType(MessageSignal.MessageType.ROBOT);
-			zombieDenSignal.setPingedLocation(rc.getLocation().x-ri.location.x, rc.getLocation().y-ri.location.y);
+			zombieDenSignal.setPingedLocation(ri.location.x-rc.getLocation().x, ri.location.y-rc.getLocation().y);
 			zombieDenSignal.setPingedTeam(Team.ZOMBIE);
 			zombieDenSignal.setPingedType(ri.type);
 			try {
@@ -55,7 +55,7 @@ public class ScoutRobot extends BaseRobot {
 			}
 			MessageSignal neutralSignal = new MessageSignal(rc);
 			neutralSignal.setMessageType(MessageSignal.MessageType.ROBOT);
-			neutralSignal.setPingedLocation(rc.getLocation().x-ri.location.x, rc.getLocation().y-ri.location.y);
+			neutralSignal.setPingedLocation(ri.location.x-rc.getLocation().x, ri.location.y-rc.getLocation().y);
 			neutralSignal.setPingedTeam(Team.NEUTRAL);
 			neutralSignal.setPingedType(ri.type);
 			try {

@@ -1,5 +1,7 @@
 package team184;
 
+import java.util.ArrayList;
+
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
@@ -24,6 +26,7 @@ public class ArchonRobot extends BaseRobot{
 	private int leaderId;
 	private MapLocation destination;
 	private MapLocation leaderLocation;
+	private ArrayList<MapLocation> neutralBotLocations = new ArrayList<MapLocation>();
 	private boolean foundSomething;
 
 	public void getSignals(){
@@ -35,6 +38,7 @@ public class ArchonRobot extends BaseRobot{
 					switch(msgSig.getMessageType()){
 					case ROBOT:
 						if(msgSig.getPingedTeam() == Team.NEUTRAL){
+							rc.setIndicatorString(0,  "Found neutral");
 							destination = msgSig.getPingedLocation();
 							foundSomething = true;
 						}
@@ -42,6 +46,8 @@ public class ArchonRobot extends BaseRobot{
 					case PARTS:
 						destination = msgSig.getPingedLocation();
 						foundSomething = true;
+					default:
+						break;
 					}
 				}
 			}
@@ -72,8 +78,45 @@ public class ArchonRobot extends BaseRobot{
 
 	@Override
 	public void run() throws GameActionException {
-
+		if(rc.getRoundNum() % 5 == 0){
+			RobotInfo[] robotsNearMe = rc.senseNearbyRobots();
+			for(RobotInfo ri : robotsNearMe){
+				if(ri.team == Team.NEUTRAL && !neutralBotLocations.contains(ri.location)){
+					neutralBotLocations.add(ri.location);
+				}
+			}
+		}
 		getSignals();
+
+		//try to heal nearby robots
+		RobotInfo[] nearbyAllies = rc.senseNearbyRobots(2, myTeam);
+		RobotInfo friendWithLowestHP = Utility.getRobotWithLowestHP(nearbyAllies);
+		if(rc.isCoreReady() && friendWithLowestHP != null){
+			if(friendWithLowestHP.type != RobotType.ARCHON){
+				rc.repair(friendWithLowestHP.location);
+			}
+		}
+		
+		MapLocation closestNeutral = Utility.closestLocation(neutralBotLocations, rc.getLocation());
+		if (closestNeutral != null) {
+			rc.setIndicatorString(2, "Finding Neutal");
+			if(rc.canSense(closestNeutral) && rc.senseRobotAtLocation(closestNeutral) == null){
+				neutralBotLocations.remove(closestNeutral);
+			}
+			else if (rc.getLocation().distanceSquaredTo(closestNeutral) < 2) {
+				if (rc.isCoreReady()) {
+					rc.activate(closestNeutral);
+					neutralBotLocations.remove(closestNeutral);
+				}
+			} else if (rc.isCoreReady() && rc.canMove(rc.getLocation().directionTo(closestNeutral))) {
+				try {
+					rc.move(rc.getLocation().directionTo(closestNeutral));
+				} catch (GameActionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 
 		//try to build a robot
 		RobotType robot = buildRobotTypes[(random.nextInt(buildRobotTypes.length))];
@@ -86,22 +129,11 @@ public class ArchonRobot extends BaseRobot{
 			}
 		}
 
-		//try to heal nearby robots
-		RobotInfo[] nearbyAllies = rc.senseNearbyRobots(2, myTeam);
-		RobotInfo friendWithLowestHP = Utility.getRobotWithLowestHP(nearbyAllies);
-		if(rc.isCoreReady() && friendWithLowestHP != null){
-			if(friendWithLowestHP.type != RobotType.ARCHON){
-				rc.repair(friendWithLowestHP.location);
-			}
-		}
 		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), RobotType.ARCHON.sensorRadiusSquared);
 		if(enemies.length > 0){
 			tryToRetreat(enemies);
-		}
-		else{
-			if(foundSomething){
-				defaultBehavior();
-			}
+		}else{
+			defaultBehavior();
 		}
 	}
 }
