@@ -1,5 +1,6 @@
 package scoutsAndSoldiers;
 
+import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
 
 public class GuardRobot extends BaseRobot {
@@ -8,12 +9,7 @@ public class GuardRobot extends BaseRobot {
 	}
 
 	@Override
-	public void initial() {
-
-	}
-
-	@Override
-	public void run() {
+	public void run() throws GameActionException {
 		defaultBehavior();
 	}
 }

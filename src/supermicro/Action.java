@@ -1,7 +1,7 @@
 package supermicro;
 import battlecode.common.*;
 
-public class Action implements Comparable{
+public class Action implements Comparable<Action>{
 	MapLocation location;
 	MapLocation goal;
 	MyActionType type;
@@ -20,8 +20,7 @@ public class Action implements Comparable{
 	}
 
 	@Override
-	public int compareTo(Object o) {
-		Action a = (Action)o;
+	public int compareTo(Action a) {
 		return (int)((this.cost+this.mannhattan()) - (a.cost+a.mannhattan()));
 	}
 	

@@ -1,5 +1,6 @@
 package scoutsAndSoldiers;
 
+import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
 
 
@@ -32,6 +33,11 @@ public class RobotPlayer {
     			System.out.println("I don't think TTMs get passed here");
     			break;
     	}
-		br.loop();
+		try {
+			br.startLoop();
+		} catch (GameActionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }

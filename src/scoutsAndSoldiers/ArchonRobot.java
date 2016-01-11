@@ -13,9 +13,9 @@ public class ArchonRobot extends BaseRobot {
     }
 
     @Override
-    public void initial() {
+    public void initialize() {
         for (Direction dir : Direction.values()) {
-            if (rc.canBuild(dir, RobotType.SCOUT)) {
+            if (rc.canBuild(dir, RobotType.SCOUT) && rc.isCoreReady()) {
                 try {
                     rc.build(dir, RobotType.SCOUT);
                 } catch (GameActionException e) {
@@ -27,58 +27,33 @@ public class ArchonRobot extends BaseRobot {
     }
 
     @Override
-    public void run() {
+    public void run() throws GameActionException {
         Direction buildDirection1 = directions[(int) (8 * Math.random())];
         Direction buildDirection2 = directions[(int) (8 * Math.random())];
         while (buildDirection2 == buildDirection1)
             buildDirection2 = directions[(int) (8 * Math.random())];
         if (rc.getRoundNum() < 30) {
-            makeScoutsAndGuards(buildDirection1, buildDirection2);
+            make(buildDirection1, buildDirection2, robotTypes[0], robotTypes[1]);
         } else {
-            makeGuardsAndSoldiers(buildDirection1, buildDirection2);
+            make(buildDirection1, buildDirection2, robotTypes[1], robotTypes[2]);
         }
     }
 
-    private void makeScoutsAndGuards(Direction buildDirection1, Direction buildDirection2) {
-        if (rc.canBuild(buildDirection1, robotTypes[0]) || rc.canBuild(buildDirection2, robotTypes[1])) {
-            if (rc.isCoreReady()) {
-                try {
-                    rc.build(buildDirection1, robotTypes[0]);
-                } catch (GameActionException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                try {
-                    rc.build(buildDirection2, robotTypes[1]);
-                } catch (GameActionException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            moveArchon(buildDirection1, buildDirection2);
-        }
-    }
 
-    private void makeGuardsAndSoldiers(Direction buildDirection1, Direction buildDirection2) {
-        if (rc.canBuild(buildDirection1, robotTypes[0]) || rc.canBuild(buildDirection2, robotTypes[1])) {
-            if (rc.isCoreReady()) {
-                try {
-                    rc.build(buildDirection1, robotTypes[1]);
-                } catch (GameActionException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                try {
-                    rc.build(buildDirection2, robotTypes[2]);
-                } catch (GameActionException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            moveArchon(buildDirection1, buildDirection2);
-        }
+    private void make(Direction buildDirection1, Direction buildDirection2, RobotType type1, RobotType type2) throws GameActionException {
+    	if(rc.isCoreReady()){
+    		if (rc.canBuild(buildDirection1, type1) || rc.canBuild(buildDirection2, type2)) {
+    			if(rc.canBuild(buildDirection1, type1)){
+    				rc.build(buildDirection1, type1);
+    			}
+    			else if(rc.canBuild(buildDirection2, type2)){
+    				 rc.build(buildDirection2, type2);
+    			}
+    			else{
+    				moveArchon(buildDirection1, buildDirection2);
+    			}
+    		}
+    	}
     }
 
     private void moveArchon(Direction buildDirection1, Direction buildDirection2) {

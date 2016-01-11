@@ -8,13 +8,9 @@ public class TurretRobot extends BaseRobot {
         super(rc);
     }
 
-    @Override
-    public void initial() {
-
-    }
 
     @Override
-    public void run() {
+    public void run() throws GameActionException {
         if (rc.getType() == RobotType.TTM) {
             defaultBehavior();
             return;
