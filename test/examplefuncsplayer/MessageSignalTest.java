@@ -28,11 +28,8 @@ public class MessageSignalTest {
 		RobotType rtype = RobotType.ZOMBIEDEN;
 		
 		RobotInfo ri = new RobotInfo(345, Team.A, RobotType.SCOUT, new MapLocation(0,0), 0, 0, 0, 100, 100, 0, 0);
-		MessageSignal send = new MessageSignal(ri);
-		send.setMessageType(type);
-		send.setPingedLocation(dx, dy);
-		send.setPingedTeam(team);
-		send.setPingedType(rtype);
+		MessageSignal send = new MessageSignal();
+		send.setRobot(ri.location.add(dx, dy), team, rtype);
 		
 		Signal sentSignal = new Signal(ri.location, ri.ID, ri.team, send.getMessage()[0], send.getMessage()[1]);
 		MessageSignal recv = new MessageSignal(sentSignal);

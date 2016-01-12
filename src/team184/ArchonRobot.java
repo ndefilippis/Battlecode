@@ -97,9 +97,8 @@ public class ArchonRobot extends BaseRobot{
 		
 		if(heiarchy == 0 && (!sentGoal || rc.getRoundNum() - lastSentGoal > 10)){
 			MessageSignal goalDirection = new MessageSignal(rc);
-			goalDirection.setMessageType(MessageSignal.MessageType.COMMAND);
 			MapLocation goal = rc.getLocation().add(teamDirection, 4);
-			goalDirection.setPingedLocation(goal);
+			goalDirection.setCommand(goal, MessageSignal.CommandType.MOVE);
 			goalDirection.send(30*30);
 			sentGoal = true;
 			while(!rc.onTheMap(rc.getLocation().add(teamDirection, 4))){

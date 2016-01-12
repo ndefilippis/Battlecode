@@ -9,21 +9,26 @@ import battlecode.common.RobotType;
 import battlecode.common.Signal;
 import battlecode.common.Team;
 
-public class MessageSignal {
+//Important!: Make sure to send right after making a signal
+
+public class MessageSignal{
 	private int[] message;
 	private RobotController rc;
 	public static enum MessageType {
-		ROBOT (0),
-		PARTS (1),
-		COMMAND (2),
-		RUBBLE (3),
-		MAP_EDGE (4);
-
-		int n;
-		MessageType(int n){
-			this.n = n;
-		}
+		ROBOT,
+		PARTS,
+		COMMAND,
+		INFO,
+		RUBBLE,
+		MAP_EDGE;
 	}
+	
+	public static enum CommandType{
+		MOVE,
+		ATTACK,
+		DIG
+	}
+	
 	Signal signal;
 
 	/*	int1: 
@@ -35,12 +40,21 @@ public class MessageSignal {
 	 * 
 	 * int2:
 	 * 	other robots:
-	 * 		pos 25-32: control bits
-	 * 		pos 11-14: robotType
-	 * 		pos 9-10:  team
-	 * 		pos 1-8:   dx, dy
+	 * 		pos 24-32: control bits
+	 * 		pos 20-23: robotType
+	 * 		pos 18-19:  team
+	 * 		pos 9-17:  dy
+	 * 		pos 1-8:   dx
 	 *   parts:
-	 *   	number of parts:
+	 *   	pos 28-32: control bits
+	 *   	pos 18-27: number of parts
+	 *   	pos 9-17: dy
+	 *   	pos 1-8: dx
+	 *   command:
+	 *   	pos 24-32: control bits
+	 *   	pos 20-23: command type
+	 *   	pos 9-17: dy
+	 *   	pos 1-8: dx
 	 */
 
 	public MessageSignal(RobotController rc){
@@ -58,49 +72,71 @@ public class MessageSignal {
 	public int[] getMessage(){
 		return message;
 	}
+	
+	public void setParts(MapLocation ml, double amount){
+		setMessageType(MessageType.PARTS);
+		setPingedLocation(ml);
+		setPingedParts((int)amount);
+	}
+	
+	public void setRobot(MapLocation ml, Team team, RobotType type){
+		setMessageType(MessageType.ROBOT);
+		setPingedType(type);
+		setPingedTeam(team);
+		setPingedLocation(ml);
+	}
 
-	public void setMessageType(MessageType type){
-		message[0] ^= type.n << 28;
+	public void setCommand(MapLocation ml, CommandType type){
+		setMessageType(MessageType.COMMAND);
+		setPingedLocation(ml);
+		setCommandType(type);
+	}
+	
+	private void setCommandType(CommandType type){
+		message[1] ^= type.ordinal() << 19;
+	}
+	public CommandType getCommandType(){
+		return CommandType.values()[message[1] >> 19 & 0xf];
+	}
+
+	private void setMessageType(MessageType type){
+		message[0] ^= type.ordinal() << 28;
 	}
 	public MessageType getMessageType(){
 		return MessageType.values()[message[0] >> 28 & 0x7];
 	}
 
-	public void setPingedLocation(int dx, int dy){
-		if(dx > 8 || dy > 8 || dx < -8 || dy < -8){
-			System.out.println("offset too big");
-			return;
-		}
-		message[1] ^= dx+8;
-		message[1] ^= (dy+8) << 4;
+	private void setPingedLocation(int dx, int dy){
+		message[1] ^= dx+128;
+		message[1] ^= (dy+128) << 8;
 	}
 	public MapLocation getPingedLocation(){
-		int dx = message[1] & 0xf - 8;
-		int dy = (message[1] >> 4 & 0xf) - 8;
+		int dx = message[1] & 0xff - 128;
+		int dy = (message[1] >> 8 & 0xff) - 128;
 		return signal.getLocation().add(dx, dy);
 	}
 
-	public void setPingedTeam(Team t){
-		message[1] ^= t.ordinal() << 8;
+	private void setPingedTeam(Team t){
+		message[1] ^= t.ordinal() << 17;
 	}
 	public Team getPingedTeam(){
-		return Team.values()[message[1] >> 8 & 0x3];
+		return Team.values()[message[1] >> 17 & 0x3];
 	}
 
-	public void setPingedType(RobotType t){
-		message[1] ^= t.ordinal() << 10;
+	private void setPingedType(RobotType t){
+		message[1] ^= t.ordinal() << 19;
 	}
 	public RobotType getPingedType(){
-		return RobotType.values()[message[1] >> 10 & 0xf];	
+		return RobotType.values()[message[1] >> 19 & 0xf];	
 	}
 
 
 
-	public void setPingedParts(int parts){
-		message[1] = parts;
+	private void setPingedParts(int parts){
+		message[1] = Math.min(parts, 1023) << 17;
 	}
 	public int getPingedParts(){
-		return message[1];
+		return message[1] >> 17 & 0x3ff;
 	}
 
 	public boolean send(int radiusSquared) throws GameActionException{
@@ -110,7 +146,7 @@ public class MessageSignal {
 		}
 		return false;
 	}
-	public void setPingedLocation(MapLocation goal) {
+	private void setPingedLocation(MapLocation goal) {
 		int dx = rc.getLocation().x-goal.x;
 		int dy = rc.getLocation().y-goal.y;
 		setPingedLocation(dx, dy);
