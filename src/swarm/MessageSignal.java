@@ -1,11 +1,10 @@
-package team184;
+package swarm;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 import battlecode.common.Signal;
 import battlecode.common.Team;
@@ -43,26 +42,26 @@ public class MessageSignal{
 	 * 	other robots:
 	 * 		pos 24-32: control bits
 	 * 		pos 20-23: robotType
-	 * 		pos 18-19:  team
+	 * 		pos 18-19: team
 	 * 		pos 9-17:  dy
 	 * 		pos 1-8:   dx
 	 *   parts:
 	 *   	pos 28-32: control bits
 	 *   	pos 18-27: number of parts
-	 *   	pos 9-17: dy
-	 *   	pos 1-8: dx
+	 *   	pos 9-17:  dy
+	 *   	pos 1-8:   dx
 	 *   command:
 	 *   	pos 24-32: control bits
 	 *   	pos 20-23: command type
-	 *   	pos 9-17: dy
-	 *   	pos 1-8: dx
+	 *   	pos 9-17:  dy
+	 *   	pos 1-8:   dx
 	 *   map edge:
 	 *   	pos	20-23: edge
 	 *   	pos 9-17:  dy
 	 *   	pos 1-8:   dx
 	 */
 	 
-	public void setMapEdge(MapLocation ml, Direction edge){
+	 public void setMapEdge(MapLocation ml, Direction edge){
 	 	setPingedLocation(ml);
 	 	setPingedDirection(edge);
 	 }

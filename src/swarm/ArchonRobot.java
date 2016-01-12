@@ -1,4 +1,4 @@
-package team184;
+package swarm;
 
 import java.util.ArrayList;
 
@@ -29,8 +29,8 @@ public class ArchonRobot extends BaseRobot{
 	private Direction teamDirection;
 	private ArrayList<MapLocation> neutralBotLocations = new ArrayList<MapLocation>();
 	private int lastSentGoal;
-	private boolean[] mapEdgesFound = new boolean[8];
-	private int[] mapEdges = new int[8];
+	private boolean[][] mapEdgesFound = new boolean[3][3];
+	private int[][] mapEdges = new int[3][3];
 
 	public void getSignals(){
 		Signal[] queue = rc.emptySignalQueue();
@@ -51,22 +51,21 @@ public class ArchonRobot extends BaseRobot{
 					case MAP_EDGE:
 						Direction edge = msgSig.getPingedDirection();
 						MapLocation ml = msgSig.getPingedLocation();
-						int loc = edge.ordinal();
 						if(edge == Direction.EAST){
-							mapEdgesFound[loc] = true;
-							mapEdges[loc] = ml.x;
+							mapEdgesFound[2][1] = true;
+							mapEdges[2][1] = ml.x;
 						}
 						if(edge == Direction.NORTH){
-							mapEdgesFound[loc] = true;
-							mapEdges[loc] = ml.y;
+							mapEdgesFound[1][0] = true;
+							mapEdges[1][0] = ml.y;
 						}
 						if(edge == Direction.SOUTH){
-							mapEdgesFound[loc] = true;
-							mapEdges[loc] = ml.y;
+							mapEdgesFound[1][2] = true;
+							mapEdges[1][2] = ml.y;
 						}
 						if(edge == Direction.WEST){
-							mapEdgesFound[loc] = true;
-							mapEdges[loc] = ml.x;
+							mapEdgesFound[0][1] = true;
+							mapEdges[0][1] = ml.x;
 						}
 						break;
 					default:
@@ -123,9 +122,6 @@ public class ArchonRobot extends BaseRobot{
 				teamDirection = randomDirection();
 			}
 			MessageSignal goalDirection = new MessageSignal(rc);
-			if(mapEdgesFound[teamDirection.ordinal()]){
-				
-			}
 			MapLocation goal = rc.getLocation().add(teamDirection, 4);
 			rc.setIndicatorString(0, goal.toString());
 			goalDirection.setCommand(goal, MessageSignal.CommandType.MOVE);

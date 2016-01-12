@@ -1,4 +1,4 @@
-package team184;
+package swarm;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -52,7 +52,7 @@ public abstract class BaseRobot {
 		initialize();
 
 		while(true){
-
+			
 			try {
 				prerun();
 				run();
@@ -60,7 +60,7 @@ public abstract class BaseRobot {
 			} catch (GameActionException e) {
 				e.printStackTrace();
 			}
-
+			
 		}
 	}
 
@@ -80,7 +80,7 @@ public abstract class BaseRobot {
 					if(nearestArchonLocation == null || s.getLocation().distanceSquaredTo(rc.getLocation()) < nearestArchonLocation.distanceSquaredTo(rc.getLocation())){
 						nearestArchonLocation = s.getLocation();
 					}
-					if(rc.getType() != RobotType.ARCHON)
+						if(rc.getType() != RobotType.ARCHON)
 						teamLocation = s.getLocation().add(nearestArchonLocation.directionTo(rc.getLocation()), 5);
 				}
 			}

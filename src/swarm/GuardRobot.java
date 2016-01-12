@@ -1,4 +1,4 @@
-package team184;
+package swarm;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;

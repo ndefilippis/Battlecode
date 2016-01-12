@@ -1,4 +1,4 @@
-package team184;
+package swarm;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +15,6 @@ public class ScoutRobot extends BaseRobot {
 	private Set<RobotInfo> sentRobots;
 	private int distanceToNearestArchon = 100;
 	private Set<MapLocation> sentPartsCaches;
-	private Set<Direction> sentMapEdges;
 	private Direction d;
 	
 	public void initialize(){
@@ -90,21 +89,6 @@ public class ScoutRobot extends BaseRobot {
 		}
 		else{
 			d = d.rotateLeft();
-		}
-		for(Direction d : Direction.values()){
-			if(d.isDiagonal() || sentMapEdges.contains(d)) continue;
-
-			int n = 7;
-			if(!rc.onTheMap(rc.getLocation().add(d, n))){
-				MessageSignal ms = new MessageSignal(rc);
-				MapLocation edge = rc.getLocation().add(d, n);
-				while(rc.onTheMap(rc.getLocation().add(d, --n))){
-					edge = rc.getLocation().add(d, n);
-				}
-				ms.setMapEdge(edge, d);
-				ms.send(distanceToNearestArchon);
-				sentMapEdges.add(d);
-			}
 		}
 	}
 }
