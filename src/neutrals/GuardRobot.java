@@ -14,6 +14,7 @@ public class GuardRobot extends BaseRobot {
 		super(rc);
 	}
 
+
 	@Override
 	public void run() throws GameActionException {
 			guardCode();

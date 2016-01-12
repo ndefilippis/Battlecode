@@ -13,6 +13,7 @@ import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
+import battlecode.common.RobotType;
 import battlecode.common.Signal;
 import battlecode.common.Team;
 /*Base Robot class for implementing the types of robots
@@ -26,21 +27,26 @@ public abstract class BaseRobot {
 			Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
 	static int[] tryDirections = {0,-1,1,-2,2}; //TODO put in navigation class
 	protected Stack<Action> moves = null;
-	protected RobotController rc;
+	protected static RobotController rc;
 	protected Team myTeam;
 	protected MapLocation teamLocation;
-	protected
-	Random random;
+	protected MapLocation nearestArchonLocation;
+	protected Random random;
 
 	public BaseRobot(RobotController rc){
-		this.rc = rc;
+		BaseRobot.rc = rc;
 		myTeam = rc.getTeam();
 		moves = new Stack<Action>();
 		random = new Random(rc.getID());
 	}
 
 	public void initialize() throws GameActionException{
-
+		RobotInfo[] nearbyRobots = rc.senseNearbyRobots(2, myTeam);
+		for(RobotInfo ri : nearbyRobots){
+			if(ri.type == RobotType.ARCHON){
+				nearestArchonLocation = ri.location;
+			}
+		}
 	}
 
 	public void startLoop() throws GameActionException{
@@ -72,6 +78,9 @@ public abstract class BaseRobot {
 				MessageSignal ms = new MessageSignal(s);
 				if(ms.getMessageType() == MessageSignal.MessageType.COMMAND){
 					teamLocation = ms.getPingedLocation();
+					if(s.getLocation().distanceSquaredTo(rc.getLocation()) < nearestArchonLocation.distanceSquaredTo(rc.getLocation())){
+						nearestArchonLocation = s.getLocation();
+					}
 				}
 			}
 		}

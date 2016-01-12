@@ -39,6 +39,7 @@ public class ArchonRobot extends BaseRobot{
 					case PARTS:
 						destination = msgSig.getPingedLocation();
 						foundSomething = true;
+						break;
 					default:
 						break;
 					}

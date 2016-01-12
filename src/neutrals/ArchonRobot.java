@@ -25,9 +25,9 @@ public class ArchonRobot extends BaseRobot{
 	}
 	private int leaderId;
 	private MapLocation destination;
-	private MapLocation leaderLocation;
+	
 	private ArrayList<MapLocation> neutralBotLocations = new ArrayList<MapLocation>();
-	private boolean foundSomething;
+	private int mapEdgeWest = 0;
 
 	public void getSignals(){
 		Signal[] queue = rc.emptySignalQueue();
@@ -40,12 +40,11 @@ public class ArchonRobot extends BaseRobot{
 						if(msgSig.getPingedTeam() == Team.NEUTRAL){
 							rc.setIndicatorString(0,  "Found neutral");
 							destination = msgSig.getPingedLocation();
-							foundSomething = true;
 						}
 						break;
 					case PARTS:
 						destination = msgSig.getPingedLocation();
-						foundSomething = true;
+						break;
 					default:
 						break;
 					}

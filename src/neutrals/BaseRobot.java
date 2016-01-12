@@ -28,6 +28,8 @@ public abstract class BaseRobot {
 	protected Stack<Action> moves = null;
 	protected RobotController rc;
 	protected Team myTeam;
+	protected MapLocation leaderLocation;
+	protected MapLocation nearestArchonLocation;
 	Random random;
 
 	public BaseRobot(RobotController rc){
@@ -38,7 +40,12 @@ public abstract class BaseRobot {
 	}
 
 	public void initialize() throws GameActionException{
-
+		RobotInfo[] nearbyRobots = rc.senseNearbyRobots(2, myTeam);
+		for(RobotInfo ri : nearbyRobots){
+			if(ri.type == RobotType.ARCHON){
+				nearestArchonLocation = ri.location;
+			}
+		}
 	}
 
 	public void startLoop() throws GameActionException{

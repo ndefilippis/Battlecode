@@ -16,7 +16,8 @@ public class ArchonRobot extends BaseRobot{
 			RobotType.SCOUT, 
 			RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
 			RobotType.GUARD, RobotType.GUARD,
-			RobotType.TURRET, RobotType.TURRET
+			RobotType.TURRET, RobotType.TURRET,
+			RobotType.VIPER
 	};
 
 	int heiarchy = -1;
@@ -46,6 +47,7 @@ public class ArchonRobot extends BaseRobot{
 						break;
 					case PARTS:
 						destination = msgSig.getPingedLocation();
+						break;
 					default:
 						break;
 					}

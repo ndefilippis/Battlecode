@@ -11,15 +11,8 @@ import battlecode.common.Team;
 
 public class SoldierRobot  extends BaseRobot {
 	Direction d = Direction.EAST;
-	MapLocation nearestArchonLocation;
 
 	public void inititalize(){
-		RobotInfo[] nearbyRobots = rc.senseNearbyRobots(2, myTeam);
-		for(RobotInfo ri : nearbyRobots){
-			if(ri.type == RobotType.ARCHON){
-				nearestArchonLocation = ri.location;
-			}
-		}
 	}
 	public SoldierRobot(RobotController rc){
 		super(rc);
@@ -46,9 +39,6 @@ public class SoldierRobot  extends BaseRobot {
 		boolean dig = false;
 		if(rc.isWeaponReady()){
 			RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().attackRadiusSquared);
-			//RobotInfo[] zombieInfo = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, Team.ZOMBIE);
-
-			//RobotInfo[] enemyInfo = Utility.combine(opponentInfo, zombieInfo);
 			if(enemyInfo.length > 0){
 				rc.attackLocation(enemyInfo[0].location);
 				d = rc.getLocation().directionTo(enemyInfo[0].location).opposite();

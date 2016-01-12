@@ -71,7 +71,7 @@ public class ScoutRobot extends BaseRobot {
 		for(int dx = -senseRadius; dx <= senseRadius; dx++){
 			for(int dy = -senseRadius; dy <= senseRadius; dy++){
 				if(rc.canSenseLocation(myLocation.add(dx, dy)) && !sentPartsCaches.contains(myLocation.add(dx, dy))){
-					if(rc.senseParts(myLocation.add(dx, dy)) > 0){
+					if(rc.senseParts(myLocation.add(dx, dy)) >= 100){
 						MessageSignal partsSignal = new MessageSignal(rc);
 						partsSignal.setMessageType(MessageSignal.MessageType.PARTS);
 						partsSignal.setPingedLocation(dx, dy);
