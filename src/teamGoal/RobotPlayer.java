@@ -1,4 +1,4 @@
-package neutrals;
+package teamGoal;
 
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
