@@ -114,6 +114,7 @@ public abstract class BaseRobot {
 			if (rc.canMove(d) && rc.isCoreReady()) {
 				if(teamLocation != null){
 					tryToMove(rc.getLocation().directionTo(teamLocation));
+					rc.setIndicatorString(1, teamLocation.toString());
 				}
 				else{
 					tryToMove(randomDirection());

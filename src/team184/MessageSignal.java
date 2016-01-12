@@ -68,6 +68,7 @@ public class MessageSignal{
 		this.signal = signal;
 		message = signal.getMessage();
 	}
+	
 
 	public int[] getMessage(){
 		return message;
@@ -107,12 +108,13 @@ public class MessageSignal{
 	}
 
 	private void setPingedLocation(int dx, int dy){
-		message[1] ^= dx+128;
-		message[1] ^= (dy+128) << 8;
+		message[1] ^= dx+127;
+		message[1] ^= (dy+127) << 8;
 	}
 	public MapLocation getPingedLocation(){
-		int dx = message[1] & 0xff - 128;
-		int dy = (message[1] >> 8 & 0xff) - 128;
+		
+		int dx = (message[1] & 0xff) - 127;
+		int dy = (message[1] >> 8 & 0xff) - 127;
 		return signal.getLocation().add(dx, dy);
 	}
 
@@ -147,8 +149,8 @@ public class MessageSignal{
 		return false;
 	}
 	private void setPingedLocation(MapLocation goal) {
-		int dx = rc.getLocation().x-goal.x;
-		int dy = rc.getLocation().y-goal.y;
+		int dx = goal.x - rc.getLocation().x;
+		int dy = goal.y - rc.getLocation().y;
 		setPingedLocation(dx, dy);
 	}
 }

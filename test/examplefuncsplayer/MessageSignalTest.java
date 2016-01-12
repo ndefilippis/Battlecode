@@ -21,22 +21,23 @@ public class MessageSignalTest {
 	
 	@Test
 	public void messageTest(){
-		MessageSignal.MessageType type = MessageSignal.MessageType.ROBOT;
-		int dx = 7;
-		int dy = -7;
-		Team team = Team.ZOMBIE;
-		RobotType rtype = RobotType.ZOMBIEDEN;
-		
-		RobotInfo ri = new RobotInfo(345, Team.A, RobotType.SCOUT, new MapLocation(0,0), 0, 0, 0, 100, 100, 0, 0);
-		MessageSignal send = new MessageSignal();
-		send.setRobot(ri.location.add(dx, dy), team, rtype);
-		
-		Signal sentSignal = new Signal(ri.location, ri.ID, ri.team, send.getMessage()[0], send.getMessage()[1]);
-		MessageSignal recv = new MessageSignal(sentSignal);
-		assertEquals(type, recv.getMessageType());
-		assertEquals(ri.location.add(dx, dy), recv.getPingedLocation());
-		assertEquals(team, recv.getPingedTeam());
-		assertEquals(rtype, recv.getPingedType());
-	}
+		int i = 0;
+		int rcx = 553;
+		int rcy = 127;
+		int pinglocx = 559;
+		int pinglocy = 124;
 
+		int dx = rcx-pinglocx;
+		int dy = rcy-pinglocy;
+		System.out.println(dx + " " + dy);
+		i ^= dx+127;
+		System.out.print(i);
+		i ^= (dy+127) << 8;
+		System.out.println(" "+i);
+		
+		int ndx = (i & 0xff) - 127;
+		int ndy = (i >> 8 & 0xff) - 127;
+		System.out.println(ndx + " " + ndy);
+		
+	}
 }

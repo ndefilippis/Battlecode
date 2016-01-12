@@ -57,7 +57,7 @@ public class ScoutRobot extends BaseRobot {
 	private void lookForPartsCache() throws GameActionException{
 		MapLocation[] partCaches = rc.sensePartLocations(rc.getType().sensorRadiusSquared);
 		for(MapLocation ml : partCaches){
-			if(rc.senseParts(ml) >= 100){
+			if(rc.senseParts(ml) >= 100 && !sentPartsCaches.contains(ml)){
 				MessageSignal partsSignal = new MessageSignal(rc);
 				partsSignal.setParts(ml, rc.senseParts(ml));
 				if(partsSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
