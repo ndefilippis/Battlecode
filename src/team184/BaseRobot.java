@@ -125,7 +125,7 @@ public abstract class BaseRobot {
 			Direction d = directions[random.nextInt(8)];
 			if (rc.canMove(d) && rc.isCoreReady()) {
 				if(teamLocation != null){
-					tryToMove(rc.getLocation().directionTo(teamLocation));
+					BugNav.goTo(teamLocation);
 					rc.setIndicatorString(1, teamLocation.toString());
 				}
 				else{

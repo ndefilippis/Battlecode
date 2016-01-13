@@ -37,7 +37,7 @@ public class ScoutRobot extends BaseRobot {
 			MessageSignal archonSignal = new MessageSignal(rc);
 			archonSignal.setRobot(ri.location, myTeam.opponent(), ri.type);
 			if(archonSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
-				sentRobots.add(ri);
+				//sentRobots.add(ri);
 			}
 		}
 	}
@@ -103,10 +103,8 @@ public class ScoutRobot extends BaseRobot {
 		
 
 
-		if(rc.canMove(d)){
-			if(rc.isCoreReady()){
-				rc.move(d);
-			}
+		if(rc.isCoreReady()){
+			tryToMove(d);
 		}
 		if(rc.getRoundNum() % 100 == 99){
 			d = randomDirection();

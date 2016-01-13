@@ -47,8 +47,9 @@ public class ArchonRobot extends BaseRobot{
 							destination = msgSig.getPingedLocation();
 						}
 						if(msgSig.getPingedType() == RobotType.ARCHON && msgSig.getPingedTeam() == myTeam.opponent()){
-							rc.setIndicatorString(1, "Found enemy Archon");
+							rc.setIndicatorString(0, "Found enemy Archon");
 							foundEnemyArchon = true;
+							sentGoal = false;
 							enemyArchon = msgSig.getPingedLocation();
 						}
 						break;
@@ -84,6 +85,7 @@ public class ArchonRobot extends BaseRobot{
 		}
 	}
 
+	@Override
 	public void initialize() throws GameActionException{
 		Signal[] signals = rc.emptySignalQueue();
 		rc.broadcastSignal(30*30);
@@ -103,10 +105,17 @@ public class ArchonRobot extends BaseRobot{
 					if(s.getMessage()[0] == 1337){
 						leaderId = s.getID();
 						teamDirection = Direction.values()[s.getMessage()[1]];
+						
 						leaderLocation = s.getLocation();
 						teamLocation = s.getLocation().add(teamDirection);
 					}
 				}
+			}
+			if(teamDirection == null){
+				teamDirection = Direction.EAST;
+				teamLocation = rc.getLocation().add(teamDirection);
+				rc.broadcastMessageSignal(1337, teamDirection.ordinal(), 50*50);
+				leaderId = rc.getID();
 			}
 		}
 	}
@@ -134,7 +143,7 @@ public class ArchonRobot extends BaseRobot{
 				
 			}
 			MapLocation goal;
-			if(foundEnemyArchon && rc.getRoundNum() > 75){
+			if(foundEnemyArchon){
 				goal = enemyArchon;
 			}
 			else{

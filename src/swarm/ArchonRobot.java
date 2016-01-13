@@ -76,7 +76,9 @@ public class ArchonRobot extends BaseRobot{
 		}
 	}
 
+	@Override
 	public void initialize() throws GameActionException{
+		
 		Signal[] signals = rc.emptySignalQueue();
 		rc.broadcastSignal(30*30);
 		heiarchy = signals.length;
@@ -92,7 +94,7 @@ public class ArchonRobot extends BaseRobot{
 			heiarchy-=1;
 			for(Signal s : signals){
 				if(s.getMessage() != null){
-					if(s.getMessage()[0] == 1337){
+					if(s.getMessage()[0] == 1337 && s.getTeam() == myTeam){
 						leaderId = s.getID();
 						teamDirection = Direction.values()[s.getMessage()[1]];
 						leaderLocation = s.getLocation();
@@ -100,6 +102,12 @@ public class ArchonRobot extends BaseRobot{
 					}
 				}
 			}
+		}
+		if(teamDirection == null){
+			teamDirection = Direction.EAST;
+			teamLocation = rc.getLocation().add(teamDirection);
+			rc.broadcastMessageSignal(1337, teamDirection.ordinal(), 50*50);
+			leaderId = rc.getID();
 		}
 	}
 
