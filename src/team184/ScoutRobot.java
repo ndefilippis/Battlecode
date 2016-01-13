@@ -17,7 +17,7 @@ public class ScoutRobot extends BaseRobot {
 	private Set<MapLocation> sentPartsCaches;
 	private Set<Direction> sentMapEdges;
 	private Direction d;
-	
+
 	public void initialize(){
 		d = randomDirection();
 	}
@@ -25,6 +25,7 @@ public class ScoutRobot extends BaseRobot {
 		super(rc);
 		sentRobots = new HashSet<RobotInfo>();
 		sentPartsCaches = new HashSet<MapLocation>();
+		sentMapEdges = new HashSet<Direction>();
 	}
 
 	private void lookForZombieDens() throws GameActionException{
@@ -71,7 +72,7 @@ public class ScoutRobot extends BaseRobot {
 		for(int dx = -senseRadius; dx <= senseRadius; dx++){
 			for(int dy = -senseRadius; dy <= senseRadius; dy++){
 				if(rc.canSenseLocation(myLocation.add(dx, dy)) && !sentPartsCaches.contains(myLocation.add(dx, dy))){
-					
+
 				}
 			}
 		}
@@ -98,9 +99,10 @@ public class ScoutRobot extends BaseRobot {
 			if(!rc.onTheMap(rc.getLocation().add(d, n))){
 				MessageSignal ms = new MessageSignal(rc);
 				MapLocation edge = rc.getLocation().add(d, n);
-				while(rc.onTheMap(rc.getLocation().add(d, --n))){
+				while(!rc.onTheMap(rc.getLocation().add(d, --n))){
 					edge = rc.getLocation().add(d, n);
 				}
+
 				ms.setMapEdge(edge, d);
 				ms.send(distanceToNearestArchon);
 				sentMapEdges.add(d);

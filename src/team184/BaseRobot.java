@@ -102,14 +102,14 @@ public abstract class BaseRobot {
 		RobotInfo sense = Utility.closest(ri, rc.getLocation());
 		if (sense != null) {
 			if(rc.isWeaponReady()){
-				double lowestHealth = 99999;
+				double lowestHealth_dps = 99999;
 				RobotInfo bestTarget = null;
 				for(RobotInfo enemy : attackable){
 					if(!enemy.type.canAttack() && bestTarget != null){
 						continue;
 					}
-					if (rc.canAttackLocation(enemy.location) && rc.getType().canAttack() && enemy.health*enemy.attackPower/(enemy.weaponDelay) < lowestHealth) {
-						lowestHealth = enemy.health*enemy.attackPower/(enemy.weaponDelay);
+					if (rc.canAttackLocation(enemy.location) && rc.getType().canAttack() && enemy.health/(enemy.attackPower-0.1)*(enemy.weaponDelay) < lowestHealth_dps) {
+						lowestHealth_dps = enemy.health/(enemy.attackPower-0.1)*(enemy.weaponDelay);
 						bestTarget = enemy;
 					}
 				}
