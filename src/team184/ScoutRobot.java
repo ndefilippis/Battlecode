@@ -27,6 +27,20 @@ public class ScoutRobot extends BaseRobot {
 		sentPartsCaches = new HashSet<MapLocation>();
 		sentMapEdges = new HashSet<Direction>();
 	}
+	
+	private void lookForEnemyArchons() throws GameActionException{
+		RobotInfo[] enemies = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, myTeam.opponent());
+		for(RobotInfo ri : enemies){
+			if(sentRobots.contains(ri) || ri.type != RobotType.ARCHON){
+				continue;
+			}
+			MessageSignal archonSignal = new MessageSignal(rc);
+			archonSignal.setRobot(ri.location, myTeam.opponent(), ri.type);
+			if(archonSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
+				sentRobots.add(ri);
+			}
+		}
+	}
 
 	private void lookForZombieDens() throws GameActionException{
 		RobotInfo[] zombies = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, Team.ZOMBIE);
@@ -81,7 +95,12 @@ public class ScoutRobot extends BaseRobot {
 	@Override
 	public void run() throws GameActionException {
 		lookForNeutralRobots();
-		lookForPartsCache();
+		
+		if(rc.getTeamParts() < 100){
+			lookForPartsCache();
+		}
+		lookForEnemyArchons();
+		
 
 
 		if(rc.canMove(d)){
@@ -89,8 +108,8 @@ public class ScoutRobot extends BaseRobot {
 				rc.move(d);
 			}
 		}
-		else{
-			d = d.rotateLeft();
+		if(rc.getRoundNum() % 100 == 99){
+			d = randomDirection();
 		}
 		for(Direction d : Direction.values()){
 			if(d.isDiagonal() || sentMapEdges.contains(d)) continue;

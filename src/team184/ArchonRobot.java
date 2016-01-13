@@ -30,6 +30,8 @@ public class ArchonRobot extends BaseRobot{
 	private ArrayList<MapLocation> neutralBotLocations = new ArrayList<MapLocation>();
 	private int lastSentGoal;
 	private boolean[] mapEdgesFound = new boolean[8];
+	private boolean foundEnemyArchon;
+	private MapLocation enemyArchon;
 	private int[] mapEdges = new int[8];
 
 	public void getSignals(){
@@ -43,6 +45,11 @@ public class ArchonRobot extends BaseRobot{
 						if(msgSig.getPingedTeam() == Team.NEUTRAL){
 							rc.setIndicatorString(0,  "Found neutral");
 							destination = msgSig.getPingedLocation();
+						}
+						if(msgSig.getPingedType() == RobotType.ARCHON && msgSig.getPingedTeam() == myTeam.opponent()){
+							rc.setIndicatorString(1, "Found enemy Archon");
+							foundEnemyArchon = true;
+							enemyArchon = msgSig.getPingedLocation();
 						}
 						break;
 					case PARTS:
@@ -126,8 +133,13 @@ public class ArchonRobot extends BaseRobot{
 			if(mapEdgesFound[teamDirection.ordinal()]){
 				
 			}
-			MapLocation goal = rc.getLocation().add(teamDirection, 4);
-			rc.setIndicatorString(0, goal.toString());
+			MapLocation goal;
+			if(foundEnemyArchon && rc.getRoundNum() > 75){
+				goal = enemyArchon;
+			}
+			else{
+				goal = rc.getLocation().add(teamDirection, 4);
+			}
 			goalDirection.setCommand(goal, MessageSignal.CommandType.MOVE);
 			goalDirection.send(30*30);
 			sentGoal = true;
