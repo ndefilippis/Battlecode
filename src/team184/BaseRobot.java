@@ -68,7 +68,7 @@ public abstract class BaseRobot {
 		Clock.yield();
 	}
 
-	public abstract void run() throws GameActionException;
+	public void run() throws GameActionException{}
 
 	protected void prerun() throws GameActionException{
 		Signal[] signals = rc.emptySignalQueue();
@@ -167,74 +167,6 @@ public abstract class BaseRobot {
 		return false;
 	}
 
-	public static void move(Action action, RobotController rc) throws GameActionException {
-		if (action.type == Action.MyActionType.DIG) {
-			rc.clearRubble(rc.getLocation().directionTo(action.location));
-		}
-		if (action.type == Action.MyActionType.MOVE) {
-			if (rc.canMove(rc.getLocation().directionTo(action.location)))
-				rc.move(rc.getLocation().directionTo(action.location));
-		}
-	}
-
-	public static Stack<Action> bestPathTo(MapLocation goal, RobotController rc) {
-		int[][] cost = new int[100][100];
-		PriorityQueue<Action> front = new PriorityQueue<Action>();
-		Set<MapLocation> visited = new HashSet<MapLocation>();
-		Action start = new Action(
-				rc.getLocation(),
-				goal,
-				Action.MyActionType.YIELD,
-				0
-				);
-		double minCost = start.mannhattan() * 40;
-		Action minAction = start;
-		front.add(start);
-		while (!front.isEmpty()) {
-			Action curr = front.poll();
-			if (curr.equals(goal)) {
-				minAction = curr;
-				break;
-			}
-			for (Direction d : Direction.values()) {
-				Action toAdd;
-				double mult = 1;
-				if (d == Direction.NONE || d == Direction.OMNI) {
-					continue;
-				}
-				if (d.isDiagonal()) {
-					mult = GameConstants.DIAGONAL_DELAY_MULTIPLIER;
-				}
-				MapLocation test = curr.location.add(d);
-				try {
-					if (test.distanceSquaredTo(rc.getLocation()) <= rc.getType().sensorRadiusSquared && rc.onTheMap(test) && !visited.contains(test) && rc.senseRobotAtLocation(test) == null) {
-						if (rc.senseRubble(test) >= 100) {
-							toAdd = new Action(test, goal, Action.MyActionType.DIG, curr.cost + 2);
-							visited.add(test);
-						} else {
-							toAdd = new Action(test, goal, Action.MyActionType.MOVE, curr.cost + 1 * mult);
-							visited.add(test);
-						}
-						toAdd.cameFrom = curr;
-						if (toAdd.mannhattan() < minCost) {
-							minCost = toAdd.mannhattan();
-							minAction = toAdd;
-						}
-						front.add(toAdd);
-					}
-				} catch (GameActionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		Stack<Action> moves = new Stack<Action>();
-		while (minAction.cameFrom != null) {
-			moves.push(minAction);
-			minAction = minAction.cameFrom;
-		}
-		return moves;
-	}
 
 	public  int tryToMove(Direction forward) throws GameActionException{
 		if(rc.isCoreReady()){
