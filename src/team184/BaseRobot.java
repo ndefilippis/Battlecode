@@ -52,15 +52,13 @@ public abstract class BaseRobot {
 		initialize();
 
 		while(true){
-
+			prerun();
 			try {
-				prerun();
 				run();
-				postrun();
 			} catch (GameActionException e) {
 				e.printStackTrace();
 			}
-
+			postrun();
 		}
 	}
 
@@ -123,12 +121,12 @@ public abstract class BaseRobot {
 			}
 		} else {
 			Direction d = directions[random.nextInt(8)];
-			if (rc.canMove(d) && rc.isCoreReady()) {
-				if(goalLocation != null){
+			if (rc.isCoreReady()) {
+				if(goalLocation != null && rc.getLocation().distanceSquaredTo(goalLocation) > rc.getType().attackRadiusSquared){
 					BugNav.goTo(goalLocation);
 					rc.setIndicatorString(1, goalLocation.toString());
 				}
-				else{
+				else if(rc.canMove(d)){
 					tryToMove(randomDirection());
 				}
 			}

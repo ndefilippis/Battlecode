@@ -22,17 +22,20 @@ public class ArchonRobot extends BaseRobot{
 	private ArrayList<MapLocation> neutralBotLocations = new ArrayList<MapLocation>();
 	private ArrayList<MapLocation> knownZombieDenLocations = new ArrayList<MapLocation>();
 	private int lastSentGoal;
-	private boolean[] mapEdgesFound = new boolean[8];
 	private boolean foundEnemyArchon;
 	private boolean foundZombieDen;
 	private MapLocation enemyArchon;
-	private int[] mapEdges = new int[8];
-
+	private double prevHealth = RobotType.ARCHON.maxHealth;
+	
 	public void getSignals(){
 		Signal[] queue = rc.emptySignalQueue();
 		for(Signal signal : queue){
 			if(signal.getTeam() == myTeam){
 				if(signal.getMessage() != null){
+					if(signal.getMessage()[0] == 0xdead && signal.getMessage()[1] == 0xbeef){
+						heiarchy--;
+						continue;
+					}
 					MessageSignal msgSig= new MessageSignal(signal);
 					switch(msgSig.getMessageType()){
 					case ROBOT:
@@ -53,27 +56,6 @@ public class ArchonRobot extends BaseRobot{
 						break;
 					case PARTS:
 						break;
-					case MAP_EDGE:
-						Direction edge = msgSig.getPingedDirection();
-						MapLocation ml = msgSig.getPingedLocation();
-						int loc = edge.ordinal();
-						if(edge == Direction.EAST){
-							mapEdgesFound[loc] = true;
-							mapEdges[loc] = ml.x;
-						}
-						if(edge == Direction.NORTH){
-							mapEdgesFound[loc] = true;
-							mapEdges[loc] = ml.y;
-						}
-						if(edge == Direction.SOUTH){
-							mapEdgesFound[loc] = true;
-							mapEdges[loc] = ml.y;
-						}
-						if(edge == Direction.WEST){
-							mapEdgesFound[loc] = true;
-							mapEdges[loc] = ml.x;
-						}
-						break;
 					default:
 						break;
 					}
@@ -93,7 +75,6 @@ public class ArchonRobot extends BaseRobot{
 		}
 		rc.setIndicatorString(1, "I am the " + heiarchy + ": " + rc.getRoundNum());
 		if(heiarchy == -1){
-			System.out.println("heyyyy");
 			goalLocation = rc.getLocation();
 			rc.broadcastMessageSignal(1337, 0, 100*100);
 			leaderId = rc.getID();
@@ -151,7 +132,6 @@ public class ArchonRobot extends BaseRobot{
 	
 	@Override
 	public void run() throws GameActionException {
-
 		//try to heal nearby robots
 		RobotInfo[] nearbyAllies = rc.senseNearbyRobots(2, myTeam);
 		RobotInfo friendWithLowestHP = Utility.getRobotWithLowestHP(nearbyAllies);
@@ -164,7 +144,7 @@ public class ArchonRobot extends BaseRobot{
 		MapLocation closestNeutral = Utility.closestLocation(neutralBotLocations, rc.getLocation());
 		if (closestNeutral != null) {
 			rc.setIndicatorString(2, "Finding Neutal");
-			if(rc.canSense(closestNeutral) && rc.senseRobotAtLocation(closestNeutral) == null){
+			if(rc.canSense(closestNeutral) && (rc.senseRobotAtLocation(closestNeutral) == null || rc.senseRobotAtLocation(closestNeutral).team != Team.NEUTRAL)){
 				neutralBotLocations.remove(closestNeutral);
 			}
 			else if (rc.getLocation().distanceSquaredTo(closestNeutral) < 2) {
@@ -195,8 +175,9 @@ public class ArchonRobot extends BaseRobot{
 					rc.build(d, robot);
 					int newid = rc.senseRobotAtLocation(rc.getLocation().add(d)).ID;
 					MessageSignal teamFirstDirective = new MessageSignal(rc);
-					if(leaderLocation != null)
+					if(leaderLocation != null){
 						teamFirstDirective.setCommand(leaderLocation, MessageSignal.CommandType.MOVE);
+					}
 					teamFirstDirective.send(2);
 				}
 			}
@@ -207,4 +188,13 @@ public class ArchonRobot extends BaseRobot{
 			defaultBehavior();
 		}
 	}
+	
+	protected void postrun() throws GameActionException{
+		if(heiarchy == 0 && rc.getHealth() < 20 && rc.getHealth() < prevHealth){
+			rc.broadcastMessageSignal(0xdead, 0xbeef, 100*100);
+		}
+		prevHealth = rc.getHealth();
+		super.postrun();
+	}
+	
 }
