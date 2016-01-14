@@ -6,7 +6,7 @@ import battlecode.common.*;
 
 public class ArchonRobot extends BaseRobot{
 	private RobotType[] buildRobotTypes = {
-			RobotType.SCOUT, RobotType.SCOUT,
+			RobotType.SCOUT, 
 			RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
 			RobotType.GUARD, RobotType.GUARD, RobotType.GUARD, RobotType.GUARD
 	};
