@@ -37,7 +37,7 @@ public class ScoutRobot extends BaseRobot {
 			MessageSignal archonSignal = new MessageSignal(rc);
 			archonSignal.setRobot(ri.location, myTeam.opponent(), ri.type);
 			if(archonSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
-				//sentRobots.add(ri);
+				sentRobots.add(ri);
 			}
 		}
 	}
@@ -93,15 +93,22 @@ public class ScoutRobot extends BaseRobot {
 	}
 
 	@Override
-	public void run() throws GameActionException {
+	protected void prerun() throws GameActionException{
 		lookForNeutralRobots();
+		lookForZombieDens();
+		lookForEnemyArchons();
 		
 		if(rc.getTeamParts() < 100){
 			lookForPartsCache();
 		}
-		lookForEnemyArchons();
-		
+	}
 
+	@Override
+	public void run() throws GameActionException {
+		
+		if(rc.senseHostileRobots(rc.getLocation(), 25).length > 4){
+			tryToRetreat(rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared));
+		}
 
 		if(rc.isCoreReady()){
 			tryToMove(d);

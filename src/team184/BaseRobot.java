@@ -28,7 +28,7 @@ public abstract class BaseRobot {
 	static int[] tryDirections = {0,-1,1,-2,2}; //TODO put in navigation class
 	protected static RobotController rc;
 	protected Team myTeam;
-	protected MapLocation teamLocation;
+	protected MapLocation goalLocation;
 	protected MapLocation nearestArchonLocation;
 	protected Random random;
 
@@ -76,12 +76,12 @@ public abstract class BaseRobot {
 			if(s.getTeam() == myTeam && s.getMessage() != null){
 				MessageSignal ms = new MessageSignal(s);
 				if(ms.getMessageType() == MessageSignal.MessageType.COMMAND){
-					teamLocation = ms.getPingedLocation();
+					goalLocation = ms.getPingedLocation();
 					if(nearestArchonLocation == null || s.getLocation().distanceSquaredTo(rc.getLocation()) < nearestArchonLocation.distanceSquaredTo(rc.getLocation())){
 						nearestArchonLocation = s.getLocation();
 					}
 					if(rc.getType() != RobotType.ARCHON && rc.getRoundNum() < 75)
-						teamLocation = s.getLocation().add(nearestArchonLocation.directionTo(rc.getLocation()), 5);
+						goalLocation = s.getLocation().add(nearestArchonLocation.directionTo(rc.getLocation()), 5);
 				}
 			}
 		}
@@ -124,9 +124,9 @@ public abstract class BaseRobot {
 		} else {
 			Direction d = directions[random.nextInt(8)];
 			if (rc.canMove(d) && rc.isCoreReady()) {
-				if(teamLocation != null){
-					BugNav.goTo(teamLocation);
-					rc.setIndicatorString(1, teamLocation.toString());
+				if(goalLocation != null){
+					BugNav.goTo(goalLocation);
+					rc.setIndicatorString(1, goalLocation.toString());
 				}
 				else{
 					tryToMove(randomDirection());

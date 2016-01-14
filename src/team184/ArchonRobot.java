@@ -2,20 +2,13 @@ package team184;
 
 import java.util.ArrayList;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Signal;
-import battlecode.common.Team;
+import battlecode.common.*;
 
 public class ArchonRobot extends BaseRobot{
 	private RobotType[] buildRobotTypes = {
 			RobotType.SCOUT, RobotType.SCOUT,
 			RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
-			RobotType.GUARD, RobotType.GUARD,
+			RobotType.GUARD, RobotType.GUARD, RobotType.GUARD, RobotType.GUARD
 	};
 
 	int heiarchy = -1;
@@ -24,10 +17,8 @@ public class ArchonRobot extends BaseRobot{
 	}
 	
 	private int leaderId;
-	private MapLocation destination;
 	private MapLocation leaderLocation;
 	private boolean sentGoal;
-	private Direction teamDirection;
 	private ArrayList<MapLocation> neutralBotLocations = new ArrayList<MapLocation>();
 	private ArrayList<MapLocation> knownZombieDenLocations = new ArrayList<MapLocation>();
 	private int lastSentGoal;
@@ -47,7 +38,6 @@ public class ArchonRobot extends BaseRobot{
 					case ROBOT:
 						if(msgSig.getPingedTeam() == Team.NEUTRAL){
 							rc.setIndicatorString(0,  "Found neutral");
-							destination = msgSig.getPingedLocation();
 						}
 						if(msgSig.getPingedType() == RobotType.ARCHON && msgSig.getPingedTeam() == myTeam.opponent()){
 							rc.setIndicatorString(0, "Found enemy Archon");
@@ -62,7 +52,6 @@ public class ArchonRobot extends BaseRobot{
 						}
 						break;
 					case PARTS:
-						destination = msgSig.getPingedLocation();
 						break;
 					case MAP_EDGE:
 						Direction edge = msgSig.getPingedDirection();
@@ -97,13 +86,18 @@ public class ArchonRobot extends BaseRobot{
 	public void initialize() throws GameActionException{
 		Signal[] signals = rc.emptySignalQueue();
 		rc.broadcastSignal(100*100);
-		heiarchy = signals.length;
+		for(Signal s : signals){
+			if(s.getTeam() == myTeam){
+				heiarchy++;
+			}
+		}
 		rc.setIndicatorString(1, "I am the " + heiarchy + ": " + rc.getRoundNum());
-		if(heiarchy == 0){
-			teamLocation = rc.getLocation().add(teamDirection);
+		if(heiarchy == -1){
+			System.out.println("heyyyy");
+			goalLocation = rc.getLocation();
 			rc.broadcastMessageSignal(1337, 0, 100*100);
 			leaderId = rc.getID();
-			
+			leaderLocation = rc.getLocation();
 		}
 		else{
 			heiarchy-=1;
@@ -111,16 +105,11 @@ public class ArchonRobot extends BaseRobot{
 				if(s.getMessage() != null){
 					if(s.getMessage()[0] == 1337){
 						leaderId = s.getID();
-						
 						leaderLocation = s.getLocation();
-						destination = leaderLocation;
+						break;
 					}
 				}
 			}
-		}
-		if(leaderLocation == null){
-			System.out.println("no");
-			leaderLocation = new MapLocation(0, 0);
 		}
 	}
 
@@ -141,9 +130,6 @@ public class ArchonRobot extends BaseRobot{
 		if(heiarchy == 0 && (!sentGoal || rc.getRoundNum() - lastSentGoal > 10)){
 			MapLocation goal;
 			MessageSignal goalDirection = new MessageSignal(rc);
-			if(mapEdgesFound[teamDirection.ordinal()]){
-				
-			}
 			if(foundZombieDen){
 				goal = knownZombieDenLocations.get(knownZombieDenLocations.size()-1);
 			}
@@ -151,16 +137,11 @@ public class ArchonRobot extends BaseRobot{
 				goal = enemyArchon;
 			}
 			else{
-				goal = rc.getLocation().add(teamDirection, 4);
+				goal = rc.getLocation();
 			}
 			goalDirection.setCommand(goal, MessageSignal.CommandType.MOVE);
 			goalDirection.send(30*30);
-			sentGoal = true;
-			while(!rc.onTheMap(rc.getLocation().add(teamDirection, 4))){
-				teamDirection = teamDirection.rotateRight();
-				sentGoal = false;
-			}
-			
+			sentGoal = true;			
 			lastSentGoal = rc.getRoundNum();
 		}
 		else{
@@ -200,6 +181,11 @@ public class ArchonRobot extends BaseRobot{
 				}
 			}
 		}
+		
+		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), RobotType.ARCHON.sensorRadiusSquared);
+		if(enemies.length > 3){
+			tryToRetreat(enemies);
+		}
 
 		//try to build a robot
 		RobotType robot = buildRobotTypes[(random.nextInt(buildRobotTypes.length))];
@@ -207,14 +193,14 @@ public class ArchonRobot extends BaseRobot{
 			if (rc.canBuild(d, robot)) {
 				if (rc.isCoreReady()) {
 					rc.build(d, robot);
+					int newid = rc.senseRobotAtLocation(rc.getLocation().add(d)).ID;
 					MessageSignal teamFirstDirective = new MessageSignal(rc);
-					teamFirstDirective.setCommand(leaderLocation, MessageSignal.CommandType.MOVE);
+					if(leaderLocation != null)
+						teamFirstDirective.setCommand(leaderLocation, MessageSignal.CommandType.MOVE);
 					teamFirstDirective.send(2);
 				}
 			}
 		}
-
-		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), RobotType.ARCHON.sensorRadiusSquared);
 		if(enemies.length > 0){
 			tryToRetreat(enemies);
 		}else{
