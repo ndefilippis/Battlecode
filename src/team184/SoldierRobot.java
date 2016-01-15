@@ -16,6 +16,7 @@ public class SoldierRobot  extends BaseRobot {
 	public SoldierRobot(RobotController rc){
 		super(rc);
 	}
+	
 
 	@Override
 	public void run() throws GameActionException {
@@ -27,12 +28,22 @@ public class SoldierRobot  extends BaseRobot {
 				nearbyArchon = true;
 			}
 		}
-		if(enemyInfo.length > 0 && allies.length < 1 && !nearbyArchon)
-			kite();
+		if(enemyInfo.length > 0 && allies.length < 1 && !nearbyArchon){
+			if(canKite(Utility.closest(enemyInfo, rc.getLocation())))
+				kite();
+			else{
+				defaultBehavior();
+			}
+		}
 		else{
 			defaultBehavior();
 		}
 	}
+
+	private boolean canKite(RobotInfo closest) {
+		return closest.type.attackRadiusSquared < rc.getType().attackRadiusSquared && closest.type.movementDelay >= rc.getType().movementDelay;
+	}
+
 
 	public void kite() throws GameActionException{
 		boolean dig = false;

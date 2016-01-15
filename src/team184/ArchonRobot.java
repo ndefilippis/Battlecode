@@ -141,6 +141,7 @@ public class ArchonRobot extends BaseRobot{
 			}
 		}
 		
+		//try to activate neutral units
 		MapLocation closestNeutral = Utility.closestLocation(neutralBotLocations, rc.getLocation());
 		if (closestNeutral != null) {
 			rc.setIndicatorString(2, "Finding Neutal");
