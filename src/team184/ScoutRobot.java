@@ -133,4 +133,11 @@ public class ScoutRobot extends BaseRobot {
 			}
 		}
 	}
+	
+	@Override
+	protected void postrun() throws GameActionException{
+		if(rc.getHealth() < 15){
+			rc.broadcastMessageSignal(0x1337, 0xbeef, distanceToNearestArchon);
+		}
+	}
 }
