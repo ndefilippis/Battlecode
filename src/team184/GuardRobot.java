@@ -43,6 +43,9 @@ public class GuardRobot extends BaseRobot {
 			if(rc.isCoreReady()){
 				MapLocation goal = enemyArray[0].location;
 				Direction toEnemy = rc.getLocation().directionTo(goal);
+				if(rc.senseRubble(rc.getLocation().add(toEnemy))>=200){
+					tryToMove(randomDirection());
+				}
 				tryToMove(toEnemy);
 			}
 		}else{//there are no enemies nearby
@@ -51,7 +54,7 @@ public class GuardRobot extends BaseRobot {
 			if(rc.isCoreReady()){
 				RobotInfo[] nearbyFriends = rc.senseNearbyRobots(2, myTeam);
 				if(nearbyFriends.length>3){
-					Direction away = Direction.values()[random.nextInt(8)];
+					Direction away = randomDirection();
 					tryToMove(away);
 				}else{//maybe a friend is in need!
 					RobotInfo[] alliesToHelp = rc.senseNearbyRobots(1000000,myTeam);

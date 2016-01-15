@@ -156,7 +156,13 @@ public abstract class BaseRobot {
 				bestRetreatDir = dir;
 			}
 		}
-
+		if(bestRetreatDir == null){
+			for(Direction d : Direction.values()){
+				if(rc.canMove(d)){
+					bestRetreatDir = d;
+				}
+			}
+		}
 		if (bestRetreatDir != null && rc.isCoreReady()) {
 			rc.move(bestRetreatDir);
 			return true;
