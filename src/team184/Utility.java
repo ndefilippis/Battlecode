@@ -2,11 +2,7 @@ package team184;
 
 import java.util.ArrayList;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
+import battlecode.common.*;
 
 public class Utility {
 
@@ -59,6 +55,15 @@ public class Utility {
 			}
 		}
 		return lowest;
+	}
+	
+	public static int getClosestRound(ZombieSpawnSchedule zss){
+		for(int i : zss.getRounds()){
+			if(i > BaseRobot.rc.getRoundNum()){
+				return i;
+			}
+		}
+		return 3000;
 	}
 
 	public static RobotInfo closest(RobotInfo[] robots, MapLocation location) {

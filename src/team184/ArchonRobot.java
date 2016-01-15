@@ -23,11 +23,13 @@ public class ArchonRobot extends BaseRobot{
 	private boolean foundZombieDen;
 	private MapLocation enemyArchon;
 	private double prevHealth = RobotType.ARCHON.maxHealth;
+	private ZombieSpawnSchedule zss;
 
 	private boolean suppressSignals;
 	
 	public ArchonRobot(RobotController rc){
 		super(rc);
+		zss = rc.getZombieSpawnSchedule();
 	}
 	
 	public void getSignals(){
@@ -145,8 +147,12 @@ public class ArchonRobot extends BaseRobot{
 			}
 		}
 		if(goalLocation != null){
+			
 			if(rc.canSense(goalLocation)){
 				goalLocation = null;
+			}
+			if(Utility.getClosestRound(zss) - rc.getRoundNum() > 50 && rc.getTeamParts() > 200){
+				tryToBuild();
 			}
 			else if(rc.isCoreReady()){
 				BugNav.goTo(goalLocation);
@@ -175,21 +181,7 @@ public class ArchonRobot extends BaseRobot{
 			tryToRetreat(enemies);
 		}
 
-		//try to build a robot
-		RobotType robot = buildRobotTypes[(random.nextInt(buildRobotTypes.length))];
-		for(Direction d : Direction.values()){
-			if (rc.canBuild(d, robot)) {
-				if (rc.isCoreReady()) {
-					rc.build(d, robot);
-					int newid = rc.senseRobotAtLocation(rc.getLocation().add(d)).ID;
-					MessageSignal teamFirstDirective = new MessageSignal(rc);
-					if(leaderLocation != null){
-						teamFirstDirective.setCommand(leaderLocation, MessageSignal.CommandType.MOVE);
-					}
-					teamFirstDirective.send(2);
-				}
-			}
-		}
+		tryToBuild();
 		if(enemies.length > 0){
 			tryToRetreat(enemies);
 			suppressSignals = true;
@@ -200,6 +192,23 @@ public class ArchonRobot extends BaseRobot{
 		suppressSignals = false;
 	}
 	
+	public void tryToBuild() throws GameActionException{
+		//try to build a robot
+				RobotType robot = buildRobotTypes[(random.nextInt(buildRobotTypes.length))];
+				for(Direction d : Direction.values()){
+					if (rc.canBuild(d, robot)) {
+						if (rc.isCoreReady()) {
+							rc.build(d, robot);
+							int newid = rc.senseRobotAtLocation(rc.getLocation().add(d)).ID;
+							MessageSignal teamFirstDirective = new MessageSignal(rc);
+							if(leaderLocation != null){
+								teamFirstDirective.setCommand(leaderLocation, MessageSignal.CommandType.MOVE);
+							}
+							teamFirstDirective.send(2);
+						}
+					}
+				}
+	}
 	protected void postrun() throws GameActionException{
 		if(heiarchy == 0 && rc.getHealth() < 20 && rc.getHealth() < prevHealth){
 			rc.broadcastMessageSignal(0xdead, 0xbeef, 100*100);

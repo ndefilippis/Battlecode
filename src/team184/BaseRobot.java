@@ -25,7 +25,7 @@ import battlecode.common.Team;
 public abstract class BaseRobot {
 
 	static int[] tryDirections = {0,-1,1,-2,2}; //TODO put in navigation class
-	protected static RobotController rc;
+	public static RobotController rc;
 	protected Team myTeam;
 	protected Team otherTeam;
 	protected RobotType myType;
