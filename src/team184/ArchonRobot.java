@@ -23,6 +23,8 @@ public class ArchonRobot extends BaseRobot{
 	private boolean foundZombieDen;
 	private MapLocation enemyArchon;
 	private double prevHealth = RobotType.ARCHON.maxHealth;
+
+	private boolean suppressSignals;
 	
 	public ArchonRobot(RobotController rc){
 		super(rc);
@@ -110,7 +112,7 @@ public class ArchonRobot extends BaseRobot{
 		getSignals();
 		
 		
-		if(heiarchy == 0 && (!sentGoal || rc.getRoundNum() - lastSentGoal > 10)){
+		if(!suppressSignals && heiarchy == 0 && (!sentGoal || rc.getRoundNum() - lastSentGoal > 10)){
 			MapLocation goal;
 			MessageSignal goalDirection = new MessageSignal(rc);
 			if(foundZombieDen){
@@ -140,6 +142,14 @@ public class ArchonRobot extends BaseRobot{
 		if(rc.isCoreReady() && friendWithLowestHP != null){
 			if(friendWithLowestHP.type != RobotType.ARCHON){
 				rc.repair(friendWithLowestHP.location);
+			}
+		}
+		if(goalLocation != null){
+			if(rc.canSense(goalLocation)){
+				goalLocation = null;
+			}
+			else if(rc.isCoreReady()){
+				BugNav.goTo(goalLocation);
 			}
 		}
 		
@@ -182,9 +192,12 @@ public class ArchonRobot extends BaseRobot{
 		}
 		if(enemies.length > 0){
 			tryToRetreat(enemies);
+			suppressSignals = true;
+			return;
 		}else{
 			defaultBehavior();
 		}
+		suppressSignals = false;
 	}
 	
 	protected void postrun() throws GameActionException{

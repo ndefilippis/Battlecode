@@ -37,6 +37,7 @@ public abstract class BaseRobot {
 	public BaseRobot(RobotController rc){
 		BaseRobot.rc = rc;
 		myTeam = rc.getTeam();
+		otherTeam = myTeam.opponent();
 		random = new Random(rc.getID());
 		birth = rc.getRoundNum();
 	}

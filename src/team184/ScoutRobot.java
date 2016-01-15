@@ -1,6 +1,8 @@
 package team184;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import battlecode.common.Direction;
@@ -15,6 +17,7 @@ public class ScoutRobot extends BaseRobot {
 	private Set<RobotInfo> sentRobots;
 	private int distanceToNearestArchon = 100;
 	private Set<MapLocation> sentPartsCaches;
+	private Map<MapLocation, Integer> sentArchonLocations;
 	private Set<Direction> sentMapEdges;
 	private Direction d;
 
@@ -26,18 +29,19 @@ public class ScoutRobot extends BaseRobot {
 		sentRobots = new HashSet<RobotInfo>();
 		sentPartsCaches = new HashSet<MapLocation>();
 		sentMapEdges = new HashSet<Direction>();
+		sentArchonLocations = new HashMap<MapLocation, Integer>();
 	}
 	
 	private void lookForEnemyArchons() throws GameActionException{
 		RobotInfo[] enemies = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, myTeam.opponent());
 		for(RobotInfo ri : enemies){
-			if(sentRobots.contains(ri) || ri.type != RobotType.ARCHON){
+			if(sentArchonLocations.containsKey(ri.location) && sentArchonLocations.get(ri.location) < 10 || ri.type != RobotType.ARCHON){
 				continue;
 			}
 			MessageSignal archonSignal = new MessageSignal(rc);
 			archonSignal.setRobot(ri.location, myTeam.opponent(), ri.type);
 			if(archonSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
-				sentRobots.add(ri);
+				sentArchonLocations.put(ri.location, rc.getRoundNum());
 			}
 		}
 	}
@@ -78,15 +82,6 @@ public class ScoutRobot extends BaseRobot {
 				partsSignal.setParts(ml, rc.senseParts(ml));
 				if(partsSignal.send(distanceToNearestArchon*distanceToNearestArchon)){
 					sentPartsCaches.add(ml);
-				}
-			}
-		}
-		int senseRadius = (int) Math.sqrt(rc.getType().sensorRadiusSquared);
-		MapLocation myLocation = rc.getLocation();
-		for(int dx = -senseRadius; dx <= senseRadius; dx++){
-			for(int dy = -senseRadius; dy <= senseRadius; dy++){
-				if(rc.canSenseLocation(myLocation.add(dx, dy)) && !sentPartsCaches.contains(myLocation.add(dx, dy))){
-
 				}
 			}
 		}

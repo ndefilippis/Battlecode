@@ -43,7 +43,12 @@ public class SoldierRobot  extends BaseRobot {
 	private boolean canKite(RobotInfo closest) {
 		if(closest.team == Team.ZOMBIE){
 			RobotInfo[] alliesNearMe = rc.senseNearbyRobots(closest.location, 100, myTeam);
-			return Utility.closest(alliesNearMe, closest.location).ID == rc.getID();
+			RobotInfo otherGuyTakingZombie = Utility.closest(alliesNearMe, closest.location);
+			if(otherGuyTakingZombie == null || otherGuyTakingZombie.location.distanceSquaredTo(closest.location) < rc.getLocation().distanceSquaredTo(closest.location)){
+				return closest.type.attackRadiusSquared < rc.getType().attackRadiusSquared && closest.type.movementDelay >= rc.getType().movementDelay;
+			}
+			else
+				return false;
 		}
 		return closest.type.attackRadiusSquared < rc.getType().attackRadiusSquared && closest.type.movementDelay >= rc.getType().movementDelay;
 	}
