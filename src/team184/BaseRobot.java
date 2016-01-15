@@ -23,20 +23,22 @@ import battlecode.common.Team;
  * 
  */
 public abstract class BaseRobot {
-	protected static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
-			Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+
 	static int[] tryDirections = {0,-1,1,-2,2}; //TODO put in navigation class
 	protected static RobotController rc;
 	protected Team myTeam;
+	protected Team otherTeam;
+	protected RobotType myType;
 	protected MapLocation goalLocation;
 	protected MapLocation nearestArchonLocation;
+	protected int birth;
 	protected Random random;
 
 	public BaseRobot(RobotController rc){
 		BaseRobot.rc = rc;
 		myTeam = rc.getTeam();
 		random = new Random(rc.getID());
-		int birth = rc.getRoundNum();
+		birth = rc.getRoundNum();
 	}
 
 	public void initialize() throws GameActionException{
@@ -119,7 +121,7 @@ public abstract class BaseRobot {
 				}
 			}
 		} else {
-			Direction d = directions[random.nextInt(8)];
+			Direction d = randomDirection();
 			if (rc.isCoreReady()) {
 				if(goalLocation != null && rc.getLocation().distanceSquaredTo(goalLocation) > rc.getType().attackRadiusSquared){
 					BugNav.goTo(goalLocation);
@@ -164,14 +166,14 @@ public abstract class BaseRobot {
 			}
 		}
 		if (bestRetreatDir != null && rc.isCoreReady()) {
-			rc.move(bestRetreatDir);
+			tryToMove(bestRetreatDir);
 			return true;
 		}
 		return false;
 	}
 
 
-	public  int tryToMove(Direction forward) throws GameActionException{
+	public int tryToMove(Direction forward) throws GameActionException{
 		if(rc.isCoreReady()){
 			for(int deltaD:tryDirections){
 				Direction maybeForward = Direction.values()[(forward.ordinal()+deltaD+8)%8];

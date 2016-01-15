@@ -80,8 +80,7 @@ public class GuardRobot extends BaseRobot {
 			if(enemyInfo.length > 0){
 				d = rc.getLocation().directionTo(enemyInfo[0].location);
 			}
-			if(rc.canMove(d))
-				rc.move(d);
+			BugNav.goTo(enemyInfo[0].location);
 		}
 	}
 }

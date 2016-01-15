@@ -12,9 +12,6 @@ public class ArchonRobot extends BaseRobot{
 	};
 
 	int heiarchy = -1;
-	public ArchonRobot(RobotController rc){
-		super(rc);
-	}
 	
 	private int leaderId;
 	private MapLocation leaderLocation;
@@ -26,6 +23,10 @@ public class ArchonRobot extends BaseRobot{
 	private boolean foundZombieDen;
 	private MapLocation enemyArchon;
 	private double prevHealth = RobotType.ARCHON.maxHealth;
+	
+	public ArchonRobot(RobotController rc){
+		super(rc);
+	}
 	
 	public void getSignals(){
 		Signal[] queue = rc.emptySignalQueue();
@@ -67,7 +68,7 @@ public class ArchonRobot extends BaseRobot{
 	@Override
 	public void initialize() throws GameActionException{
 		Signal[] signals = rc.emptySignalQueue();
-		rc.broadcastSignal(100*100);
+		rc.broadcastSignal(GameConstants.MAP_MAX_HEIGHT*GameConstants.MAP_MAX_HEIGHT);
 		for(Signal s : signals){
 			if(s.getTeam() == myTeam){
 				heiarchy++;
@@ -87,6 +88,7 @@ public class ArchonRobot extends BaseRobot{
 					if(s.getMessage()[0] == 1337){
 						leaderId = s.getID();
 						leaderLocation = s.getLocation();
+						goalLocation = leaderLocation;
 						break;
 					}
 				}
@@ -154,12 +156,7 @@ public class ArchonRobot extends BaseRobot{
 					neutralBotLocations.remove(closestNeutral);
 				}
 			} else if (rc.isCoreReady() && rc.canMove(rc.getLocation().directionTo(closestNeutral))) {
-				try {
-					rc.move(rc.getLocation().directionTo(closestNeutral));
-				} catch (GameActionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				tryToMove(rc.getLocation().directionTo(closestNeutral));
 			}
 		}
 		

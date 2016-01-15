@@ -41,6 +41,10 @@ public class SoldierRobot  extends BaseRobot {
 	}
 
 	private boolean canKite(RobotInfo closest) {
+		if(closest.team == Team.ZOMBIE){
+			RobotInfo[] alliesNearMe = rc.senseNearbyRobots(closest.location, 100, myTeam);
+			return Utility.closest(alliesNearMe, closest.location).ID == rc.getID();
+		}
 		return closest.type.attackRadiusSquared < rc.getType().attackRadiusSquared && closest.type.movementDelay >= rc.getType().movementDelay;
 	}
 
@@ -73,7 +77,7 @@ public class SoldierRobot  extends BaseRobot {
 				rc.clearRubble(d);
 			}
 			else if(rc.canMove(d)){
-				rc.move(d);
+				tryToMove(d);
 			}
 		}
 	}
