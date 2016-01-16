@@ -28,16 +28,32 @@ public class SoldierRobot  extends BaseRobot {
 				nearbyArchon = true;
 			}
 		}
-		if(enemyInfo.length > 0 && allies.length < 1 && !nearbyArchon){
-			if(canKite(Utility.closest(enemyInfo, rc.getLocation())))
+		int attackingAllies = getNonRangedAllies();
+		
+		if(enemyInfo.length > 0 && attackingAllies < 1 && !nearbyArchon){
+			if(canKite(Utility.closest(enemyInfo, rc.getLocation()))){
 				kite();
+				rc.setIndicatorString(0, "I am kiting");
+			}
 			else{
+				rc.setIndicatorString(0, "I am not kiting");
 				defaultBehavior();
 			}
 		}
 		else{
 			defaultBehavior();
 		}
+	}
+	
+	private int getNonRangedAllies(){
+		int robs = 0;
+		RobotInfo[] allies = rc.senseNearbyRobots(100, myTeam);
+		for(RobotInfo ri : allies){
+			if(ri.type != RobotType.SOLDIER && ri.type != RobotType.VIPER){
+				robs++;
+			}
+		}
+		return robs;
 	}
 
 	private boolean canKite(RobotInfo closest) {
@@ -48,7 +64,7 @@ public class SoldierRobot  extends BaseRobot {
 				return closest.type.attackRadiusSquared < rc.getType().attackRadiusSquared && closest.type.movementDelay >= rc.getType().movementDelay;
 			}
 			else
-				return false;
+				return otherGuyTakingZombie.location.distanceSquaredTo(closest.location) != rc.getLocation().distanceSquaredTo(closest.location);
 		}
 		return closest.type.attackRadiusSquared < rc.getType().attackRadiusSquared && closest.type.movementDelay >= rc.getType().movementDelay;
 	}
