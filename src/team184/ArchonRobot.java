@@ -7,12 +7,13 @@ import battlecode.common.*;
 public class ArchonRobot extends BaseRobot{
 	private RobotType[] buildRobotTypes = {
 			RobotType.SCOUT, 
-			RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER, RobotType.SOLDIER,
-			RobotType.GUARD, RobotType.GUARD, RobotType.GUARD, RobotType.GUARD
+			RobotType.SOLDIER,
+			RobotType.GUARD, 
 	};
+	private double[] probabilities = {0.1, 0.6, 1.0};
 
 	int heiarchy = -1;
-	
+
 	private int leaderId;
 	private MapLocation leaderLocation;
 	private boolean sentGoal;
@@ -26,12 +27,12 @@ public class ArchonRobot extends BaseRobot{
 	private ZombieSpawnSchedule zss;
 
 	private boolean suppressSignals;
-	
+
 	public ArchonRobot(RobotController rc){
 		super(rc);
 		zss = rc.getZombieSpawnSchedule();
 	}
-	
+
 	public void getSignals(){
 		Signal[] queue = rc.emptySignalQueue();
 		for(Signal signal : queue){
@@ -115,9 +116,9 @@ public class ArchonRobot extends BaseRobot{
 			}
 		}
 		getSignals();
-		
-		
-		if(!suppressSignals && heiarchy == 0 && (!sentGoal || rc.getRoundNum() - lastSentGoal > 10)){
+
+
+		if(!suppressSignals && heiarchy == -1 && (!sentGoal || rc.getRoundNum() - lastSentGoal > 10)){
 			MapLocation goal;
 			MessageSignal goalDirection = new MessageSignal(rc);
 			if(foundZombieDen){
@@ -132,16 +133,18 @@ public class ArchonRobot extends BaseRobot{
 				goal = rc.getLocation();
 				goalDirection.setCommand(goal, MessageSignal.CommandType.MOVE);
 			}
-			
+
 			goalDirection.send(30*30);
 			sentGoal = true;			
 			lastSentGoal = rc.getRoundNum();
+			rc.setIndicatorString(2, goal+"");
 		}
 		else{
+			rc.setIndicatorString(2, "");
 			super.prerun();
 		}
 	}
-	
+
 	@Override
 	public void run() throws GameActionException {
 		//try to heal nearby robots
@@ -153,7 +156,7 @@ public class ArchonRobot extends BaseRobot{
 			}
 		}
 		if(goalLocation != null){
-			
+
 			if(rc.canSense(goalLocation)){
 				goalLocation = null;
 			}
@@ -164,7 +167,7 @@ public class ArchonRobot extends BaseRobot{
 				BugNav.goTo(goalLocation);
 			}
 		}
-		
+
 		//try to activate neutral units
 		MapLocation closestNeutral = Utility.closestLocation(neutralBotLocations, rc.getLocation());
 		if (closestNeutral != null) {
@@ -181,7 +184,7 @@ public class ArchonRobot extends BaseRobot{
 				tryToMove(rc.getLocation().directionTo(closestNeutral));
 			}
 		}
-		
+
 		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), RobotType.ARCHON.sensorRadiusSquared);
 		if(enemies.length > 3){
 			tryToRetreat(enemies);
@@ -197,23 +200,28 @@ public class ArchonRobot extends BaseRobot{
 		}
 		suppressSignals = false;
 	}
-	
+
 	public void tryToBuild() throws GameActionException{
 		//try to build a robot
-				RobotType robot = buildRobotTypes[(random.nextInt(buildRobotTypes.length))];
-				for(Direction d : Direction.values()){
-					if (rc.canBuild(d, robot)) {
-						if (rc.isCoreReady()) {
-							rc.build(d, robot);
-							int newid = rc.senseRobotAtLocation(rc.getLocation().add(d)).ID;
-							MessageSignal teamFirstDirective = new MessageSignal(rc);
-							if(leaderLocation != null){
-								teamFirstDirective.setCommand(leaderLocation, MessageSignal.CommandType.MOVE);
-							}
-							teamFirstDirective.send(2);
-						}
+		double prob = random.nextDouble();
+		int index = 0;
+		while(prob > probabilities[index]){
+			index++;
+		}
+		RobotType robot = buildRobotTypes[index];
+		for(Direction d : Direction.values()){
+			if (rc.canBuild(d, robot)) {
+				if (rc.isCoreReady()) {
+					rc.build(d, robot);
+					int newid = rc.senseRobotAtLocation(rc.getLocation().add(d)).ID;
+					MessageSignal teamFirstDirective = new MessageSignal(rc);
+					if(leaderLocation != null){
+						teamFirstDirective.setCommand(leaderLocation, MessageSignal.CommandType.MOVE);
 					}
+					teamFirstDirective.send(2);
 				}
+			}
+		}
 	}
 	protected void postrun() throws GameActionException{
 		if(heiarchy == 0 && rc.getHealth() < 20 && rc.getHealth() < prevHealth){
@@ -222,5 +230,5 @@ public class ArchonRobot extends BaseRobot{
 		prevHealth = rc.getHealth();
 		super.postrun();
 	}
-	
+
 }

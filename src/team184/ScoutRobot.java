@@ -7,6 +7,7 @@ import java.util.Set;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
@@ -33,6 +34,9 @@ public class ScoutRobot extends BaseRobot {
 	}
 	
 	private void lookForEnemyArchons() throws GameActionException{
+		if(rc.getMessageSignalCount() > GameConstants.MESSAGE_SIGNALS_PER_TURN){
+			return;
+		}
 		RobotInfo[] enemies = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, myTeam.opponent());
 		for(RobotInfo ri : enemies){
 			if(sentArchonLocations.containsKey(ri.location) && sentArchonLocations.get(ri.location) < 10 || ri.type != RobotType.ARCHON){
@@ -47,6 +51,9 @@ public class ScoutRobot extends BaseRobot {
 	}
 
 	private void lookForZombieDens() throws GameActionException{
+		if(rc.getMessageSignalCount() > GameConstants.MESSAGE_SIGNALS_PER_TURN){
+			return;
+		}
 		RobotInfo[] zombies = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, Team.ZOMBIE);
 		for(RobotInfo ri : zombies){
 			if(sentRobots.contains(ri) || ri.type != RobotType.ZOMBIEDEN){
@@ -61,6 +68,9 @@ public class ScoutRobot extends BaseRobot {
 	}
 
 	private void lookForNeutralRobots() throws GameActionException{
+		if(rc.getMessageSignalCount() > GameConstants.MESSAGE_SIGNALS_PER_TURN){
+			return;
+		}
 		RobotInfo[] neutralRobots = rc.senseNearbyRobots(rc.getType().sensorRadiusSquared, Team.NEUTRAL);
 		for(RobotInfo ri : neutralRobots){
 			if(sentRobots.contains(ri)){
@@ -75,6 +85,9 @@ public class ScoutRobot extends BaseRobot {
 	}
 
 	private void lookForPartsCache() throws GameActionException{
+		if(rc.getMessageSignalCount() > GameConstants.MESSAGE_SIGNALS_PER_TURN){
+			return;
+		}
 		MapLocation[] partCaches = rc.sensePartLocations(rc.getType().sensorRadiusSquared);
 		for(MapLocation ml : partCaches){
 			if(rc.senseParts(ml) >= 100 && !sentPartsCaches.contains(ml)){
@@ -111,22 +124,6 @@ public class ScoutRobot extends BaseRobot {
 		if(rc.getRoundNum() % 100 == 99){
 			d = randomDirection();
 		}
-		for(Direction d : Direction.values()){
-			if(d.isDiagonal() || sentMapEdges.contains(d)) continue;
-
-			int n = 7;
-			if(!rc.onTheMap(rc.getLocation().add(d, n))){
-				MessageSignal ms = new MessageSignal(rc);
-				MapLocation edge = rc.getLocation().add(d, n);
-				while(!rc.onTheMap(rc.getLocation().add(d, --n))){
-					edge = rc.getLocation().add(d, n);
-				}
-
-				ms.setMapEdge(edge, d);
-				ms.send(distanceToNearestArchon);
-				sentMapEdges.add(d);
-			}
-		}
 	}
 	
 	@Override
@@ -134,5 +131,6 @@ public class ScoutRobot extends BaseRobot {
 		if(rc.getHealth() < 15){
 			rc.broadcastMessageSignal(0x1337, 0xbeef, distanceToNearestArchon);
 		}
+		super.postrun();
 	}
 }

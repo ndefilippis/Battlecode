@@ -1,5 +1,6 @@
 package team184;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Random;
@@ -139,7 +140,20 @@ public abstract class BaseRobot {
 					
 				}
 				else{
-					tryToMove(randomDirection());
+					int[] bestDirection = new int[8];
+					RobotInfo[] allies = rc.senseNearbyRobots(100, myTeam);
+					for(RobotInfo ally : allies){
+						bestDirection[ally.location.directionTo(rc.getLocation()).ordinal()]++;
+					}
+					int max = 0;
+					int ord = 0;
+					for(int i = 0; i < bestDirection.length; i++){
+						if(bestDirection[i] > max){
+							max = bestDirection[i];
+							ord = i;
+						}
+					}
+					tryToMove(Direction.values()[ord]);
 				}
 			}
 		}
@@ -183,12 +197,16 @@ public abstract class BaseRobot {
 		return false;
 	}
 
-
+	private ArrayList<MapLocation> previousMoves = new ArrayList<MapLocation>();
 	public int tryToMove(Direction forward) throws GameActionException{
+		if(previousMoves.size() > 5){
+			previousMoves.remove(0);
+		}
 		if(rc.isCoreReady()){
 			for(int deltaD:tryDirections){
 				Direction maybeForward = Direction.values()[(forward.ordinal()+deltaD+8)%8];
-				if(rc.canMove(maybeForward)){
+				if(rc.canMove(maybeForward) && !previousMoves.contains(rc.getLocation().add(maybeForward))){
+					previousMoves.add(rc.getLocation());
 					rc.move(maybeForward);
 					return deltaD;
 				}
@@ -201,7 +219,7 @@ public abstract class BaseRobot {
 				}
 			}
 		}
-		return 0;
+		return 0xdead;
 	}
 
 	public Direction randomDirection() {

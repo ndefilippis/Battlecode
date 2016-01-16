@@ -107,12 +107,7 @@ public class SoldierRobot  extends BaseRobot {
 			}
 		}
 		if(rc.isCoreReady()){
-			if(dig){
-				rc.clearRubble(d);
-			}
-			else if(rc.canMove(d)){
-				tryToMove(d);
-			}
+			tryToMove(d);
 		}
 	}
 }
