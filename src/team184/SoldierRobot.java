@@ -11,7 +11,6 @@ import battlecode.common.Team;
 
 public class SoldierRobot  extends BaseRobot {
 	Direction d = Direction.EAST;
-	
 
 	public SoldierRobot(RobotController rc){
 		super(rc);
@@ -20,7 +19,9 @@ public class SoldierRobot  extends BaseRobot {
 
 	@Override
 	public void run() throws GameActionException {
+
 		RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared);
+
 		RobotInfo[] allies = rc.senseNearbyRobots(9, myTeam);
 		boolean nearbyArchon = false;
 		for(RobotInfo ri : allies){
@@ -64,7 +65,7 @@ public class SoldierRobot  extends BaseRobot {
 				return closest.type.attackRadiusSquared < rc.getType().attackRadiusSquared && closest.type.movementDelay >= rc.getType().movementDelay;
 			}
 			else
-				return otherGuyTakingZombie.location.distanceSquaredTo(closest.location) != rc.getLocation().distanceSquaredTo(closest.location);
+				return otherGuyTakingZombie.type == RobotType.SOLDIER || otherGuyTakingZombie.location.distanceSquaredTo(closest.location) == rc.getLocation().distanceSquaredTo(closest.location);
 		}
 		return closest.type.attackRadiusSquared < rc.getType().attackRadiusSquared && closest.type.movementDelay >= rc.getType().movementDelay;
 	}
@@ -72,14 +73,22 @@ public class SoldierRobot  extends BaseRobot {
 
 	public void kite() throws GameActionException{
 		boolean dig = false;
+		RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().attackRadiusSquared);
 		if(rc.isWeaponReady()){
-			RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().attackRadiusSquared);
+			
 			//RobotInfo[] zombieInfo = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, Team.ZOMBIE);
 
 			//RobotInfo[] enemyInfo = Utility.combine(opponentInfo, zombieInfo);
 			if(enemyInfo.length > 0){
 				rc.attackLocation(enemyInfo[0].location);
-				d = rc.getLocation().directionTo(enemyInfo[0].location).opposite();
+			}
+		}
+		if(enemyInfo.length > 0){
+			for(Direction q : Direction.values()){
+				if(rc.getLocation().add(q).distanceSquaredTo(enemyInfo[0].location) > enemyInfo[0].type.attackRadiusSquared && rc.canMove(q)){
+					d = q;
+					rc.setIndicatorString(1, d.toString());
+				}
 			}
 		}
 		boolean toTurn = Utility.isBlocked(rc, rc.getLocation().add(d, 3)) && rc.isCoreReady();

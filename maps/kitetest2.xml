@@ -66,18 +66,22 @@
     </initialParts>
     <zombieSpawnSchedule/>
     <initialRobots>
-      <initial-robot originOffsetX="8" originOffsetY="13" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="8" originOffsetY="16" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="8" originOffsetY="18" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="10" originOffsetY="10" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="10" originOffsetY="20" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="12" originOffsetY="20" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="13" originOffsetY="16" type="BIGZOMBIE" team="ZOMBIE"/>
-      <initial-robot originOffsetX="14" originOffsetY="10" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="15" originOffsetY="20" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="17" originOffsetY="19" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="18" originOffsetY="10" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="18" originOffsetY="11" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="18" originOffsetY="12" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="19" originOffsetY="10" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="19" originOffsetY="11" type="SOLDIER" team="B"/>
       <initial-robot originOffsetX="19" originOffsetY="12" type="SOLDIER" team="B"/>
-      <initial-robot originOffsetX="19" originOffsetY="15" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="20" originOffsetY="10" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="20" originOffsetY="11" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="20" originOffsetY="12" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="21" originOffsetY="10" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="21" originOffsetY="11" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="21" originOffsetY="12" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="22" originOffsetY="10" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="22" originOffsetY="11" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="22" originOffsetY="12" type="SOLDIER" team="B"/>
+      <initial-robot originOffsetX="24" originOffsetY="5" type="BIGZOMBIE" team="ZOMBIE"/>
     </initialRobots>
   </game-map>
 </object-stream>
