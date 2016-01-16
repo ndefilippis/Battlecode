@@ -21,7 +21,10 @@ public class GuardRobot extends BaseRobot {
 
 	private void guardCode() throws GameActionException {
 		RobotInfo[] enemyArray = rc.senseHostileRobots(rc.getLocation(), 1000000);
-
+		RobotInfo[] allies = rc.senseNearbyRobots(100, myTeam);
+		if(enemyArray.length > 2*allies.length){
+			tryToRetreat(enemyArray);
+		}
 		if(enemyArray.length>0){
 			if(rc.isWeaponReady()){
 				//look for adjacent enemies to attack

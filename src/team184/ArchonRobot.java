@@ -71,6 +71,9 @@ public class ArchonRobot extends BaseRobot{
 
 	@Override
 	public void initialize() throws GameActionException{
+		if(rc.getRoundNum() != 0){
+			return;
+		}
 		Signal[] signals = rc.emptySignalQueue();
 		rc.broadcastSignal(GameConstants.MAP_MAX_HEIGHT*GameConstants.MAP_MAX_HEIGHT);
 		for(Signal s : signals){
@@ -119,14 +122,17 @@ public class ArchonRobot extends BaseRobot{
 			MessageSignal goalDirection = new MessageSignal(rc);
 			if(foundZombieDen){
 				goal = knownZombieDenLocations.get(knownZombieDenLocations.size()-1);
+				goalDirection.setCommand(goal, MessageSignal.CommandType.ATTACK);
 			}
 			else if(foundEnemyArchon){
 				goal = enemyArchon;
+				goalDirection.setCommand(goal, MessageSignal.CommandType.ATTACK);
 			}
 			else{
 				goal = rc.getLocation();
+				goalDirection.setCommand(goal, MessageSignal.CommandType.MOVE);
 			}
-			goalDirection.setCommand(goal, MessageSignal.CommandType.MOVE);
+			
 			goalDirection.send(30*30);
 			sentGoal = true;			
 			lastSentGoal = rc.getRoundNum();

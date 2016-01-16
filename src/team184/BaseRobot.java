@@ -33,6 +33,7 @@ public abstract class BaseRobot {
 	protected MapLocation nearestArchonLocation;
 	protected int birth;
 	protected Random random;
+	protected MessageSignal.CommandType currentCommandType;
 
 	public BaseRobot(RobotController rc){
 		BaseRobot.rc = rc;
@@ -78,6 +79,7 @@ public abstract class BaseRobot {
 				MessageSignal ms = new MessageSignal(s);
 				if(ms.getMessageType() == MessageSignal.MessageType.COMMAND){
 					goalLocation = ms.getPingedLocation();
+					currentCommandType = ms.getCommandType();
 					if(nearestArchonLocation == null || s.getLocation().distanceSquaredTo(rc.getLocation()) < nearestArchonLocation.distanceSquaredTo(rc.getLocation())){
 						nearestArchonLocation = s.getLocation();
 					}
@@ -122,13 +124,21 @@ public abstract class BaseRobot {
 				}
 			}
 		} else {
-			Direction d = randomDirection();
 			if (rc.isCoreReady()) {
-				if(goalLocation != null && rc.getLocation().distanceSquaredTo(goalLocation) > rc.getType().attackRadiusSquared){
+				if(goalLocation != null){
 					BugNav.goTo(goalLocation);
 					rc.setIndicatorString(1, goalLocation.toString());
+					if(currentCommandType == MessageSignal.CommandType.MOVE && rc.getLocation().distanceSquaredTo(goalLocation) <= rc.getType().sensorRadiusSquared){
+						goalLocation = null;
+						currentCommandType = null;
+					}
+					if(currentCommandType == MessageSignal.CommandType.ATTACK && rc.getLocation().distanceSquaredTo(goalLocation) <= rc.getType().sensorRadiusSquared && rc.senseRobotAtLocation(goalLocation) == null){
+						goalLocation = null;
+						currentCommandType = null;
+					}
+					
 				}
-				else if(rc.canMove(d)){
+				else{
 					tryToMove(randomDirection());
 				}
 			}

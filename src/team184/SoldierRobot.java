@@ -19,10 +19,14 @@ public class SoldierRobot  extends BaseRobot {
 
 	@Override
 	public void run() throws GameActionException {
-
+		
 		RobotInfo[] enemyInfo = rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared);
-
-		RobotInfo[] allies = rc.senseNearbyRobots(9, myTeam);
+		RobotInfo[] allies = rc.senseNearbyRobots(100, myTeam);
+		if(enemyInfo.length > 2*allies.length){
+			tryToRetreat(enemyInfo);
+		}
+		
+		allies = rc.senseNearbyRobots(9, myTeam);
 		boolean nearbyArchon = false;
 		for(RobotInfo ri : allies){
 			if(ri.type == RobotType.ARCHON){
