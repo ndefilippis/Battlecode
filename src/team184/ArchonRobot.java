@@ -10,7 +10,8 @@ public class ArchonRobot extends BaseRobot{
 			RobotType.SOLDIER,
 			RobotType.GUARD, 
 	};
-	private double[] probabilities = {0.1, 0.6, 1.0};
+	private double[] probabilities = {0.1, 0.65, 1.0};
+	private double[] probabilitiesZ = {0.0, 0.4, 1.0};
 
 	int heiarchy = -1;
 
@@ -205,10 +206,19 @@ public class ArchonRobot extends BaseRobot{
 		//try to build a robot
 		double prob = random.nextDouble();
 		int index = 0;
-		while(prob > probabilities[index]){
-			index++;
+		RobotType robot;
+		if(Utility.getClosestRound(zss) < 30){
+			while(prob > probabilitiesZ[index]){
+				index++;
+			}
+			robot = buildRobotTypes[index];
 		}
-		RobotType robot = buildRobotTypes[index];
+		else{
+			while(prob > probabilities[index]){
+				index++;
+			}
+		    robot = buildRobotTypes[index];
+		}
 		for(Direction d : Direction.values()){
 			if (rc.canBuild(d, robot)) {
 				if (rc.isCoreReady()) {
@@ -222,6 +232,7 @@ public class ArchonRobot extends BaseRobot{
 				}
 			}
 		}
+		return;
 	}
 	protected void postrun() throws GameActionException{
 		if(heiarchy == 0 && rc.getHealth() < 20 && rc.getHealth() < prevHealth){
