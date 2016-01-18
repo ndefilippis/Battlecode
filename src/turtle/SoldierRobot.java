@@ -1,4 +1,4 @@
-package team184;
+package turtle;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -62,9 +62,6 @@ public class SoldierRobot  extends BaseRobot {
 	}
 
 	private boolean canKite(RobotInfo closest) {
-		if(closest.type.canAttack()){
-			return false;	
-		}
 		if(closest.team == Team.ZOMBIE){
 			RobotInfo[] alliesNearMe = rc.senseNearbyRobots(closest.location, 100, myTeam);
 			RobotInfo otherGuyTakingZombie = Utility.closest(alliesNearMe, closest.location);

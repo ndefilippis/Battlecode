@@ -1,4 +1,4 @@
-package team184;
+package turtle;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ public class ArchonRobot extends BaseRobot{
 			RobotType.SOLDIER,
 			RobotType.GUARD, 
 	};
-	private double[] probabilities = {0.0, 0.60, 1.0};
+	private double[] probabilities = {0.1, 0.65, 1.0};
 	private double[] probabilitiesZ = {0.0, 0.4, 1.0};
 
 	int heiarchy = -1;
@@ -159,7 +159,7 @@ public class ArchonRobot extends BaseRobot{
 				rc.repair(friendWithLowestHP.location);
 			}
 		}
-		if(goalLocation != null){
+		if(goalLocation != null && rc.getRoundNum() < 150){
 
 			if(rc.canSense(goalLocation)){
 				goalLocation = null;
@@ -207,35 +207,20 @@ public class ArchonRobot extends BaseRobot{
 
 	public void tryToBuild() throws GameActionException{
 		//try to build a robot
-		Direction dl = randomDirection();
-		if(rc.getRoundNum() % 400 < 20 && rc.canBuild(dl, RobotType.SCOUT) && rc.isCoreReady()){
-			rc.build(dl, RobotType.SCOUT);
-		}
 		double prob = random.nextDouble();
 		int index = 0;
 		RobotType robot;
-		if(Utility.getClosestRound(zss) < 30){
-			while(prob > probabilitiesZ[index]){
-				index++;
+		if(rc.getRoundNum() < 50){
+			for(Direction d : Direction.values()){
+				if(rc.canBuild(d, RobotType.SOLDIER) && rc.isCoreReady()){
+					rc.build(d, RobotType.SOLDIER);
+				}
 			}
-			robot = buildRobotTypes[index];
 		}
 		else{
-			while(prob > probabilities[index]){
-				index++;
-			}
-		    robot = buildRobotTypes[index];
-		}
-		for(Direction d : Direction.values()){
-			if (rc.canBuild(d, robot)) {
-				if (rc.isCoreReady()) {
-					rc.build(d, robot);
-					int newid = rc.senseRobotAtLocation(rc.getLocation().add(d)).ID;
-					MessageSignal teamFirstDirective = new MessageSignal(rc);
-					if(leaderLocation != null){
-						teamFirstDirective.setCommand(leaderLocation, MessageSignal.CommandType.MOVE);
-					}
-					teamFirstDirective.send(2);
+			for(Direction d : Direction.values()){
+				if(rc.canBuild(d, RobotType.TURRET) && rc.isCoreReady()){
+					rc.build(d, RobotType.TURRET);
 				}
 			}
 		}

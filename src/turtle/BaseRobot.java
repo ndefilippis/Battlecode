@@ -1,4 +1,4 @@
-package team184;
+package turtle;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,7 +49,6 @@ public abstract class BaseRobot {
 		for(RobotInfo ri : nearbyRobots){
 			if(ri.type == RobotType.ARCHON){
 				nearestArchonLocation = ri.location;
-				System.out.println("Hello Matey");
 			}
 		}
 	}
@@ -200,7 +199,7 @@ public abstract class BaseRobot {
 
 	private ArrayList<MapLocation> previousMoves = new ArrayList<MapLocation>();
 	public int tryToMove(Direction forward) throws GameActionException{
-		if(previousMoves.size() > 2){
+		if(previousMoves.size() > 5){
 			previousMoves.remove(0);
 		}
 		if(rc.isCoreReady()){
