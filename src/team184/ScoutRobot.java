@@ -31,6 +31,7 @@ public class ScoutRobot extends BaseRobot {
 		sentPartsCaches = new HashMap<MapLocation, Integer>();
 		sentMapEdges = new HashMap<Direction, Integer>();
 		sentArchonLocations = new HashMap<MapLocation, Integer>();
+		nearestArchonLocation = rc.getLocation().add(Direction.SOUTH);
 	}
 
 	private void lookForEnemyArchons() throws GameActionException{
@@ -114,12 +115,19 @@ public class ScoutRobot extends BaseRobot {
 
 	@Override
 	public void run() throws GameActionException {
-
-		if(rc.senseHostileRobots(rc.getLocation(), 25).length > 4){
-			tryToRetreat(rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared));
+		RobotInfo[] nearbyEnemies = rc.senseHostileRobots(rc.getLocation(), 25);
+		if(nearbyEnemies.length > 4){
+			if(!rc.isInfected()){
+				tryToRetreat(rc.senseHostileRobots(rc.getLocation(), rc.getType().sensorRadiusSquared));
+			}
+			else{
+				tryToMove(rc.getLocation().directionTo(nearbyEnemies[0].location));
+			}
 		}
-
 		if(rc.isCoreReady()){
+			if(rc.isInfected()){
+				tryToMove(rc.getLocation().directionTo(nearestArchonLocation).opposite());
+			}
 			tryToMove(d);
 		}
 		if(rc.getRoundNum() % 100 == 99){

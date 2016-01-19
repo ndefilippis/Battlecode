@@ -77,10 +77,11 @@ public abstract class BaseRobot {
 	protected void prerun() throws GameActionException{
 		Signal[] signals = rc.emptySignalQueue();
 		for(Signal s : signals){
-			if(s.getTeam() == myTeam && s.getMessage() != null){
+			if(s.getTeam() == myTeam && s.getMessage().length >= 2){
 				MessageSignal ms = new MessageSignal(s);
 				if(ms.getMessageType() == MessageSignal.MessageType.COMMAND){
 					goalLocation = ms.getPingedLocation();
+					rc.setIndicatorString(0, ""+s.getMessage()[1]);
 					currentCommandType = ms.getCommandType();
 					if(nearestArchonLocation == null || s.getLocation().distanceSquaredTo(rc.getLocation()) < nearestArchonLocation.distanceSquaredTo(rc.getLocation())){
 						nearestArchonLocation = s.getLocation();

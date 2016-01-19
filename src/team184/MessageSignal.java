@@ -52,8 +52,8 @@ public class MessageSignal{
 	 *   	pos 9-17: dy
 	 *   	pos 1-8: dx
 	 *   command:
-	 *   	pos 24-32: control bits
-	 *   	pos 20-23: command type
+	 *   	pos 28-32: control bits
+	 *   	pos 24-27: command type
 	 *   	pos 9-17: dy
 	 *   	pos 1-8: dx
 	 *   map edge:
@@ -110,10 +110,10 @@ public class MessageSignal{
 	}
 	
 	private void setCommandType(CommandType type){
-		message[1] ^= type.ordinal() << 19;
+		message[1] ^= type.ordinal() << 27;
 	}
 	public CommandType getCommandType(){
-		return CommandType.values()[message[1] >> 19 & 0xf];
+		return CommandType.values()[message[1] >> 27 & 0x3];
 	}
 
 	private void setMessageType(MessageType type){

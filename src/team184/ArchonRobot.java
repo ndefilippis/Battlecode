@@ -167,7 +167,7 @@ public class ArchonRobot extends BaseRobot{
 			if(Utility.getClosestRound(zss) - rc.getRoundNum() > 50 && rc.getTeamParts() > 200){
 				tryToBuild();
 			}
-			else if(rc.isCoreReady()){
+			else if(rc.isCoreReady() && goalLocation != null){
 				BugNav.goTo(goalLocation);
 			}
 		}

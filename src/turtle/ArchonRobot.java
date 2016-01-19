@@ -173,7 +173,7 @@ public class ArchonRobot extends BaseRobot{
 		}
 
 		//try to activate neutral units
-		MapLocation closestNeutral = Utility.closestLocation(neutralBotLocations, rc.getLocation());
+		/*MapLocation closestNeutral = Utility.closestLocation(neutralBotLocations, rc.getLocation());
 		if (closestNeutral != null) {
 			rc.setIndicatorString(2, "Finding Neutal");
 			if(rc.canSense(closestNeutral) && (rc.senseRobotAtLocation(closestNeutral) == null || rc.senseRobotAtLocation(closestNeutral).team != Team.NEUTRAL)){
@@ -187,20 +187,20 @@ public class ArchonRobot extends BaseRobot{
 			} else if (rc.isCoreReady() && rc.canMove(rc.getLocation().directionTo(closestNeutral))) {
 				tryToMove(rc.getLocation().directionTo(closestNeutral));
 			}
-		}
+		}*/
 
 		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), RobotType.ARCHON.sensorRadiusSquared);
 		if(enemies.length > 3){
-			tryToRetreat(enemies);
+			//tryToRetreat(enemies);
 		}
 
 		tryToBuild();
 		if(enemies.length > 0){
-			tryToRetreat(enemies);
+			//tryToRetreat(enemies);
 			suppressSignals = true;
 			return;
 		}else{
-			defaultBehavior();
+			//defaultBehavior();
 		}
 		suppressSignals = false;
 	}
