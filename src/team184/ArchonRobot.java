@@ -10,7 +10,7 @@ public class ArchonRobot extends BaseRobot{
 			RobotType.SOLDIER,
 			RobotType.GUARD, 
 	};
-	private double[] probabilities = {0.0, 0.60, 1.0};
+	private double[] probabilities = {0.0, 0.35, 1.0};
 	private double[] probabilitiesZ = {0.0, 0.4, 1.0};
 
 	int heiarchy = -1;
