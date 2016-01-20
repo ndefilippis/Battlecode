@@ -138,7 +138,7 @@ public class ArchonRobot extends BaseRobot{
 				goalDirection.setCommand(goal, MessageSignal.CommandType.MOVE);
 			}
 
-			goalDirection.send(30*30);
+			goalDirection.send(GameConstants.MAP_MAX_HEIGHT*GameConstants.MAP_MAX_HEIGHT);
 			sentGoal = true;			
 			lastSentGoal = rc.getRoundNum();
 			rc.setIndicatorString(2, goal+"");
