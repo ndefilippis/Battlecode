@@ -48,7 +48,7 @@ public class BugNav extends BaseRobot{
                 rc.move(dir);
                 return true;
             }
-            if(rc.senseRubble(rc.getLocation().add(dir)) < 200 && rc.onTheMap(rc.getLocation().add(dir))){
+            if(rc.senseRubble(rc.getLocation().add(dir)) > 50 && rc.onTheMap(rc.getLocation().add(dir))){
             	rc.clearRubble(dir);
             	return true;
             }
